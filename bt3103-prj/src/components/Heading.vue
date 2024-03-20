@@ -15,7 +15,7 @@
           Enhance your portfolio with anyone, anywhere, anytime
         </div>
         <div class="button">
-          <div class="label">Join our community here</div> 
+          <div class="label">Join our community here</div>
         </div>
       </div>
     </div>
