@@ -1,6 +1,6 @@
 <template>
 <section class="section3">
-    <div class="intro"><span id="title">Our Projects</span></div>
+    <div class="intro"><span id="title">Our Projects change</span></div>
   </section>
 </template>
 
