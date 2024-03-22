@@ -1,39 +1,41 @@
 <template>
-    <section class="heading-section">
-        <div class="bg"></div>
-        <img class="pic" src="./icons/home-pic.png" />
-        <div class="frame">
-            <div class="text">
-                <div class="heading">
-                    <span id="collab">Collab and Conquer <br> </span>
-                    <span id="meet"> Meet like-minded individuals <br> to work on project</span>
-                </div>
-                <div class="subtitle">
-                    Enhance your porforlio with anyone, anywhere, anytime
-                </div>
-                <button id="join" type="button" v-on:click="gotoAuth">Join our community</button>
 
-            </div>
-        </div>
-    </section> <br>
+        <section class="heading-section">
+            <div class="bg"></div>
+            <img class="pic" src="./icons/home-pic.png" />
+            <div class="frame">
+                <div class="text">
+                    <div class="heading">
+                        <span id="collab">Collab and Conquer <br> </span>
+                        <span id="meet"> Meet like-minded individuals <br> to work on project</span>
+                    </div>
+                    <div class="subtitle">
+                        Enhance your porforlio with anyone, anywhere, anytime
+                    </div>
+                    <button id="join" type="button" v-on:click="gotoAuth">Join our community</button>
 
-    <section class="students-section">
-        <div class="students">
-            <div class="intro">
-                <h1 id="title">Our Students </h1>
-                <span id="description">Our students come from various institution</span>
+                </div>
             </div>
-            <div class="logos">
-                <img src='./icons/client1.png'>
-                <img src='./icons/client2.png'>
-                <img src='./icons/client3.png'>
-                <img src='./icons/client4.png'>
-                <img src='./icons/client5.png'>
-                <img src='./icons/client6.png'>
-                <img src='./icons/client7.png'>
+        </section> <br>
+
+        <section class="students-section">
+            <div class="students">
+                <div class="intro">
+                    <h1 id="title">Our Students </h1>
+                    <span id="description">Our students come from various institution</span>
+                </div>
+                <div class="logos">
+                    <img src='./icons/client1.png'>
+                    <img src='./icons/client2.png'>
+                    <img src='./icons/client3.png'>
+                    <img src='./icons/client4.png'>
+                    <img src='./icons/client5.png'>
+                    <img src='./icons/client6.png'>
+                    <img src='./icons/client7.png'>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+ 
 </template>
 
 <script>
@@ -47,6 +49,7 @@ export default {
 </script>
 
 <style scoped>
+
 .heading-section {
     height: 414.21px;
     position: relative;
@@ -58,6 +61,9 @@ export default {
 
     position: absolute;
     background: #fdf8f6;
+}
+.students-section {
+    background-color: white;
 }
 
 .pic {

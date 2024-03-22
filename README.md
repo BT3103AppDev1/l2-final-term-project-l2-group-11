@@ -1,4 +1,4 @@
-# bt3103-prj
+# Bt3103 final project
 
 This template should help get you started developing with Vue 3 in Vite.
 

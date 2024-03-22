@@ -1,5 +1,5 @@
 {
-  "name": "bt3103-prj",
+  "name": "bt3103-final-project",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/vue-fontawesome": "^3.0.6",
+    "bcrypt": "^5.1.1",
     "firebase": "^10.9.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.1.6"
+    "vite": "^5.1.5"
   }
 }
