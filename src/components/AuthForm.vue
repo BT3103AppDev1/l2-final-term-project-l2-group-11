@@ -1,29 +1,40 @@
+<script setup>
+import loadingSpinner from "./Loading.vue";
+</script>
+
 <template>
     <div class = "authForm-container">
-        <img src = "../assets/Kaizenlogo.jpeg"/>
+        <loadingSpinner v-show = "loading"/>
+        <div class = "logo">
+            <img class = "kaizen-logo" src = "../assets/kaizenlogo.jpeg"/>
+            <img class = "kaizen" src = "../assets/Kaizen.jpeg"/>
+        </div>
         <form id = "authForm">
             <div class = "label-input-div">
                 <label for = "auth-email-input">Email Address</label>
                 <input type = "text" v-model = "EmailAddress" id = "auth-email-input" placeholder = " Email address">
             </div>
-            <div class = "label-input-div">
-                <label v-show = "state != 'Verify'" for = "auth-password-input">Password</label>
-                <input v-show = "state != 'Verify'" type = "text" v-model = "Password" id = "auth-password-input" placeholder = " Password">
+            <div v-show = "state != 'Verify'" class = "label-input-div">
+                <label for = "auth-password-input">Password</label>
+                <input type = "text" v-model = "Password" id = "auth-password-input" placeholder = " Password">
             </div>
-            
-            <div class = "label-input-div">
-                <label v-show = "state == 'Verify'" for = "auth-verification-code-input">Verification Code</label>
-                <div v-show = "state == 'Verify'" class = "auth-verification-code-input-div">
+            <div v-show = "state == 'Verify'" class = "label-input-div">
+                <label for = "auth-verification-code-input">Verification Code</label>
+                <div class = "auth-verification-code-input-div">
                     <input type = "text" v-model = "VerificationCode" id = "auth-verification-code-input" placeholder = " Verification Code">
-                    <button type = "button" v-on:click = "verify">Verify</button>
+                    <button type = "button" :disabled = "EmailAddress == ''" v-on:click = "requestCode">Request Code</button>
                 </div>
             </div>
 
-            <div class = "label-input-div">
-                <label v-show = "state == 'Register' || state == 'Verified'" for = "auth-confirm-password-input">Confirm Password</label>
-                <input v-show = "state == 'Register' || state == 'Verified'" type = "text" v-model = "ConfirmPassword" id = "auth-confirm-password-input" placeholder = "confirm password">
+            <div v-show = "state == 'Register' || state == 'Verified'" class = "label-input-div">
+                <label for = "auth-confirm-password-input">Confirm Password</label>
+                <input type = "text" v-model = "ConfirmPassword" id = "auth-confirm-password-input" placeholder = "confirm password">
             </div>
-            <button type = "button" :disabled = "state == 'Verify'">{{buttonState}}</button>
+
+            <button v-show = "state == 'Login'" type = "button" :disabled = "EmailAddress == '' && Password == ''" v-on:click = "login">Login</button>
+            <button v-show = "state == 'Register'" type = "button" :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" v-on:click = "register">Register</button>
+            <button v-show = "state == 'Verified'" type = "button" :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" v-on:click = "resetPassword">Reset</button>
+            <button v-show = "state == 'Verify'" type = "button" :disabled = "EmailAddress == '' && VerificationCode == ''" v-on:click = "verify">Verify</button>
         </form>
         <div class = "other-auth-options">
             <button type = "button" v-on:click = "toggleAuthState"> 
@@ -38,6 +49,9 @@
 </template>
 
 <script>
+import firebaseApp from "../Firebase.js";
+import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
+const db = getFirestore(firebaseApp);
 
 export default {
     data() {
@@ -47,27 +61,79 @@ export default {
             ConfirmPassword: "",
             VerificationCode: "",
             state: "Login",
-            buttonState: "Login"
+            loading: false
         }
     },
     methods : {
         toggleAuthState() {
             if (this.state == "Login") {
                 this.state = "Register";
-                this.buttonState = "Register"
+                this.EmailAddress = ""
+                this.Password = "",
+                this.ConfirmPassword = ""
             } else {
                 this.state = "Login";
-                this.buttonState = "Login"
+                this.EmailAddress = ""
+                this.ConfirmPassword = "",
+                this.Password = ""
             }
         },
+
+        async login() {
+            this.loading = true;
+            console.log(this.EmailAddress);
+            let userCred = await getDoc(doc(db,"KaizenPersonalTest", this.EmailAddress));
+            if (!userCred.exists()) {
+                this.loading = false;
+                alert("This email does not have an account, please try again");
+            } else {
+                if (userCred.data().password == this.Password) {
+                    this.loading = false;
+                    alert("Login successful");
+                } else {
+                    this.loading = false;
+                    alert("Invalid password please try again");
+                }
+            }
+            this.loading = false;
+        },
+
+        async register() {
+            this.loading = true;
+            if (this.Password != this.ConfirmPassword) {
+                this.loading = false;
+                alert("Passwords do not match, please try again");
+            } else {
+                let userCred = await getDoc(doc(db,"KaizenPersonalTest", this.EmailAddress));
+                if (userCred.exists()) {
+                    this.loading = false;
+                    alert("This email already has a registered an account, please try again");
+                } else {
+                    await setDoc(doc(db,"KaizenPersonalTest", this.EmailAddress), {
+                        password : this.Password
+                    });
+                    this.loading = false;
+                    alert("Email registered successfully");
+                }
+            }
+        },
+
         updateStateToVerify() {
             this.state = "Verify";
-            this.buttonState = "Reset"
+            this.EmailAddress = "";
+            this.Password = "";
+            this.ConfirmPassword = "";
+        },
+
+        requestCode() {
+
         },
         verify() {
-            this.state = "Verified";
+
         },
-       
+        resetPassword() {
+
+        }       
     }
 
 }
@@ -88,9 +154,24 @@ export default {
     width:100%;
 }
 
-img {
+.logo {
     width:350px;
+    display:flex;
+    flex-direction:row;
+    justify-content: center;
+    align-items: center;
+    gap:30px;
     margin-bottom:20px;
+}
+
+.kaizen-logo {
+    height:70px;
+    width:70px;
+}
+
+.kaizen {
+    height:70px;
+    width:250px;
 }
 
 #authForm {
@@ -113,8 +194,7 @@ img {
     height:35px;
     border:none;
     border-radius: 3px;
-    background-color: #D3D3D3;
-    color:grey;
+    background-color: #cacaca;
 }
 
 #authForm label {
@@ -146,7 +226,6 @@ img {
 #authForm button {
     outline: none;
     border: none;
-    
     background-color: #F5793B;
     color:#FDF8F6;
     font-size: 13px;

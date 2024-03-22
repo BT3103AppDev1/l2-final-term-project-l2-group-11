@@ -1,109 +1,167 @@
 <template>
-  <div id="nav">
-    <div class="logo">
-      <img src="./assets/Kaizenlogo.jpeg" />
+    <div id ="nav">
+        <router-link to = "/" class = "nav-logo-link">
+            <div class = "nav-logo">
+                <img class = "nav-kaizen-logo" src = "./assets/kaizenlogo.jpeg"/>
+                <img class = "nav-kaizen" src = "./assets/kaizen.jpeg"/>
+            </div>
+        </router-link>
+        <div class = "link-button-container">
+            <div class = "link">
+                <router-link to = "/" class = "router-link" > About </router-link> 
+                <router-link to = "/project" class = "router-link" > Project </router-link> 
+            </div>
+            <div class = "login-register-buttons">
+               <router-link to = "/auth" class = "router-link">Login</router-link>
+               <router-link to = "/auth" class = "router-link">Register</router-link>
+            </div>
+        </div>
     </div>
-    <div class="link-button-container">
-      <div class="link">
-        <router-link to="/"> About </router-link>
-
-        <router-link to="/auth"> Authentication </router-link>
-      </div>
-      <div class="login-register-buttons">
-        <button type="button">Login</button>
-        <button type="button">Register</button>
-      </div>
+    <div class = router-view>
+        <router-view/>
     </div>
-  </div>
-  <div class=router-view>
-    <router-view />
-  </div>
-</template>
+  </template>
+  
+  <script>
+  
+  export default {
+    name: 'App',
+  }
+  </script>
+  
+  <style>
+  #app {
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    height:100vh;
+    width:100vw;
+  }
+ 
+  #nav {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    height:10%;
+    width:100vw;
+    background-color: #FDF8F6;
+  }
+  .nav-logo-link {
+    height:100%;
+    width:20%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background-color: #FDF8F6;
+  }
 
-<script>
+  .nav-logo-link:hover {
+    background-color: #FDF8F6;
+  }
 
-export default {
-  name: 'App',
-}
-</script>
+  .nav-logo {
+    height:100%;
+    width:100%;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:5px;
+    padding-left:30px;
+  }
 
-<style>
-#app {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-}
+  .nav-logo .nav-kaizen-logo {
+    height:30px;
+    width:30px;
+  }
 
-#nav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 10%;
-  width: 100vw;
-  background-color: #FDF8F6;
-}
+  .nav-logo .nav-kaizen {
+    height:30px;
+    width:120px;
+  }
 
-.logo {
-  height: 100%;
-  width: 10%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+  .link-button-container {
+    display:flex;
+    flex-direction:row;
+    justify-content: space-between;
+    align-items:center;
+    height:100%;
+    width:80%;
+  }
 
-#nav img {
-  height: 40px;
-  width: 170px;
-  padding-left: 30px;
-}
+  .link {
+    display:flex;
+    flex-direction:row;
+    gap: 30px;
+    align-items:center;
+    height:100%;
+    color:#F5793B;
+    padding-left:100px;
+  }
+  .link .router-link {
+    color: #F5793B;
+    font-size: 20px;
+    font-weight: 600;
+    background-color:#FDF8F6
+  }
 
-.link-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  width: 90%;
-}
+  .link .router-link-active {
+    text-decoration: underline;
+    font-size:25px;
+  }
 
-.link {
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
-  align-items: center;
-  height: 100%;
-  color: #F5793B;
-  padding-left: 100px;
-  font-size: 15px;
-  ;
-}
+  .link .router-link:hover {
+    background-color:#FDF8F6;
+    font-size:25px;
+  }
 
-.login-register-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 100%;
-  gap: 30px;
-  padding-right: 30px;
-}
+  .login-register-buttons {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    height:100%;
+    gap: 30px;
+    padding-right:30px;
+  }
 
-.login-register-buttons button {
-  outline: none;
-  border: none;
-  background-color: #F5793B;
-  height: 40px;
-  width: 80px;
-  font-size: 15px;
-  color: #FDF8F6;
-  border-radius: 3px;
-}
+  .login-register-buttons .router-link {
+    color:white;
+    font-size: 15px;
+    font-weight: 400;
+    background-color: #F5793B;
+    border-radius: 5px;
+    height:40px;
+    width:75px;
+    display:flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-register-buttons .router-link:hover {
+    background-color:orange;
+  }
 
-.router-view {
-  height: 90%;
-  width: 100vw;
-}
-</style>
+  .router-view {
+    height:90%;
+    width:100vw;
+  }
+
+  
+  </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
