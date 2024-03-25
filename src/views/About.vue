@@ -3,7 +3,7 @@ import Heading from "../components/Heading.vue";
 import Project from "../components/HomeProject.vue";
 </script>
 
-<template>
+<template> 
     <Heading/>
     <Project/>
 </template>

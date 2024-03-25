@@ -16,12 +16,20 @@ const routes = [
     {
         path: '/auth',
         name: 'Auth',
-        component: Authentication
-    },
+        component: Authentication,
+    }
 ]
 
 const router = createRouter({
  history: createWebHistory(),
  routes
 })
+
+router.beforeEach(async (to, from) => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    if (storedData && to.name === "Auth") {
+        return { name: 'About' }
+    }
+})
+
 export default router
