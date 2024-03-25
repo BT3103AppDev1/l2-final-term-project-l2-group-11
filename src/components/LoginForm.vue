@@ -14,7 +14,6 @@
 
 <script>
 import firebaseApp from "../Firebase.js";
-import uuidGenerator from "../uuid.js";
 import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
