@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar.vue";
     <div class = router-view>
         <router-view/>
     </div>
-  </template>
+</template>
   
   <script>  
     import { getAuth, onAuthStateChanged, signOut} from "firebase/auth";

@@ -40,15 +40,25 @@ export default {
                 this.loading = false;
                 alert("Passwords do not match, please try again");
             } else {
-                createUserWithEmailAndPassword(getAuth(), this.EmailAddress.toLowerCase(), this.Password)
-                .then((userCredential) => {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(getAuth(), this.EmailAddress.toLowerCase(), this.Password)
                     const user = userCredential.user;
-                    this.$router.push("/");
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                });
+                    const userID = user.uid;
+                    const userDocRef = doc(db, 'User Information', userID);
+                    //this creates a new document in Firestore
+
+                    await setDoc(userDocRef, {
+                        email: this.EmailAddress,
+                    });
+                    //store email address in the doc above.
+
+                    console.log("User registered and Firestore document created with User ID")
+                    this.$router.push({name: 'SignUpQuestionaire', params: { userId: userID } });
+
+                } catch(error) {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+            };
             }
             this.loading = false;
         }

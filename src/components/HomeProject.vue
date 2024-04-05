@@ -8,6 +8,11 @@
   .intro {
     text-align: center;
   }
+
+  .projects{
+    background-color:white;
+    color:black;
+  }
   
   #title {
     text-align: center;

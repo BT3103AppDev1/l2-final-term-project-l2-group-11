@@ -182,6 +182,7 @@ export default {
     align-items: center;
     gap: 11.14px;
     display: inline-flex;
+    color:black;
 }
 
 .logos {
