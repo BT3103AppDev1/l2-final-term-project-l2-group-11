@@ -1,22 +1,29 @@
 <script setup>
 import Heading from "../components/Heading.vue";
-import Project from "../components/HomeProject.vue";
+import HomeProject from "../components/HomeProject.vue";
 </script>
 
 <template> 
-    <Heading/>
-    <Project/>
+    <div class = "project-page-wrapper">
+        <Heading/>
+        <HomeProject/>
+    </div>
 </template>
-
 <script>
     export default {
         name:"About",
         components: {
             Heading,
-            Project
+            HomeProject
         }
     }
 </script>
+
+<style scoped>
+.project-page-wrapper {
+    background-color:white;
+}
+</style>
 
 
 
