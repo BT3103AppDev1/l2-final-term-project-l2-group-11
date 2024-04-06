@@ -16,7 +16,7 @@ export default {
 
   data() {
     return {
-      userstate: true,
+      userstate: false,
       searchInput: '',
       projects: [],
       filteredProjects: []
@@ -26,15 +26,15 @@ export default {
     this.fetchProjects();
   },
 
-  // mounted() {
-  //   firebase.auth().onAuthStateChanged((user) => {
-  //     if (user) {
-  //       this.userstate = true; // User is logged in
-  //     } else {
-  //       this.userstate = false;
-  //     }
-  //   })
-  // },
+  mounted() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.userstate = true; // User is logged in
+      } else {
+        this.userstate = false;
+      }
+    })
+  },
 
   methods: {
     async fetchProjects() {
@@ -76,7 +76,7 @@ export default {
     <div id="flex-container">
       <div id="title-container">
         <div id="title">
-          <mark class="orange">Collab</mark> with your peer to <mark class="orange"> explore your potential</mark> <br>
+          <mark class="orange">Collab</mark> <mark class="black">with your peer to</mark> <mark class="orange"> explore your potential</mark> <br>
         </div>
         <div id="search-bar">
           <input type="text" v-model="searchInput" placeholder="Search" id="rounded-search" @keyup.enter="submitSearch"/>
@@ -126,6 +126,7 @@ export default {
 <style scoped>
 
 #flex-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -181,10 +182,20 @@ mark.orange {
     background: none;
 }
 
+mark.black {
+  color:black;
+  background: none;
+}
+
 .projects-container {
   margin-left: 50px;
   font-size: 25px;
-  font-weight: 550;
+  font-weight: 550px;
+}
+
+.projectCategory {
+  color: black;
+  font-weight: 300px;
 }
 
 .projects-cart {
