@@ -1,7 +1,4 @@
 <template>
-    <div id="navBar">
-        <h3>"Fake nav bar"</h3>
-    </div>
     <SearchProjects/>
 </template>
 

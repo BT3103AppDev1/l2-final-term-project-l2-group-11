@@ -12,38 +12,66 @@
                 <router-link to = "/project" class = "router-link" > Project </router-link> 
             </div>
             <div v-if = "!isLoggedIn" class = "login-register-buttons">
-               <router-link to = "/auth" class = "router-link">Login</router-link>
-               <router-link to = "/auth" class = "router-link">Register</router-link>
+                <router-link to = "/auth" class = "router-link">Login</router-link>
+                <router-link to = "/auth" class = "router-link">Register</router-link>
             </div>
-            <button v-else v-on:click.prevent = "tempLogout">Temp logout button</button>
+            <div v-else id="profile-menu" @click="toggleDropdown" class="profile-dropdown">
+              <img v-bind:src="profileImageUrl" class="profile-icon" />
+              <div v-if="dropdownOpen" class="dropdown-content">
+                <a @click="goUserProfile">Your Profile</a>
+                <a @click.prevent="tempLogout">Log Out</a>
+              </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
     import { getAuth, onAuthStateChanged, signOut} from "firebase/auth";
+    import { getFirestore } from "firebase/firestore";
+    import { collection, getDoc, doc, deleteDoc } from "firebase/firestore";
+    import firebaseApp from '../Firebase.js';
+
+    const db = getFirestore(firebaseApp);
+
     export default {
     data() {
         return {
             isLoggedIn : false,
+            dropdownOpen: false,
+            uid: '',
+            userProfile: null,
+            profileImageUrl:''
         }
     }, 
     methods : {
+        toggleDropdown() {
+          this.dropdownOpen = !this.dropdownOpen;
+        },
         tempLogout() {
-            const auth = getAuth();
-            const user = auth.currentUser;
-            signOut(auth,user);
-            this.$router.push("/");
+          const auth = getAuth();
+          const user = auth.currentUser;
+          signOut(auth,user);
+          this.$router.push("/");
+        },
+        goUserProfile() {
+          this.$router.push({name: 'Profile', params: {userId: this.uid}});
         }
     }, 
     mounted() {
         const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 this.isLoggedIn = true;
-                const uid = user.uid;
+                this.uid = user.uid;
+                const docRef = doc(db, "User Information", user.uid);
+                const docSnap = await getDoc(docRef);
+                this.userProfile = docSnap.data();
+                this.profileImageUrl = this.userProfile.profileImageUrl;
             } else {
                 this.isLoggedIn = false;
+                this.uid = '';
+                this.userProfile = null;
             }
         });
     }
@@ -100,6 +128,7 @@
     align-items:center;
     height:100%;
     width:80%;
+    padding-right:30px;
   }
 
   .link {
@@ -153,4 +182,48 @@
   .login-register-buttons .router-link:hover {
     background-color:orange;
   }
+
+  .profile-dropdown {
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    cursor: pointer;
+    position: relative;
+  }
+
+.dropdown-content {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 100%;
+  right: 0; /* Align the dropdown to the right */
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1; /* Make sure it's on top of other elements */
+}
+
+.dropdown-content a {
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  color: black;
+}
+
+.profile-dropdown:hover .dropdown-content {
+  display: block; /* Show dropdown on hover */
+}
+
+/* Style adjustments for when dropdown is active */
+.profile-dropdown .dropdown-content {
+  display: block;
+}
+
+.profile-icon {
+  width: 40px; /* Adjust size as needed */
+  height: 40px; /* Adjust size as needed */
+  border-radius: 50%; /* Makes the image round */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+  cursor: pointer; /* Changes the cursor to indicate it's clickable */
+  position: relative;
+}
 </style>

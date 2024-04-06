@@ -19,14 +19,14 @@
                         <span>{{ daysToDeadline }} days to go</span>
                     </div>
                     <div class = "bookmark-icon">
-                        <img v-on:click = "toggleBookmark" v-if = "bookmarked" src = "../assets/bookmark.png"/>
-                        <img v-on:click = "toggleBookmark" v-else src = "../assets/bookmark-white.png"/>
+                        <img @click.stop = "toggleBookmark" v-if = "bookmarked" src = "../assets/bookmark.png"/>
+                        <img @click.stop = "toggleBookmark" v-else src = "../assets/bookmark-white.png"/>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-else class="card">
+        <div v-else class="card" @click="goToLogin">
             <div class="card-image">
                 <img v-bind:src="imageUrl" alt="Very cool picture">
             </div>  
@@ -63,23 +63,23 @@ const db = getFirestore(firebaseApp);
 export default {
     data() {
         return {
-            userstate: true,
-            uid: '971a9f7c-86be-449b-b831-59e381d459e0',
+            userstate: false,
+            uid: '',
             bookmarked: false
         }
     },
 
-    // mounted() {
-    //     firebase.auth().onAuthStateChanged((user) => {
-    //         if (user) {
-    //             this.userstate = true; // User is logged in
-    //             this.uid = user.uid;
-    //         } else {
-    //             this.userstate = false; // User is not logged in
-    //             this.uid = '';
-    //         }
-    //     })
-    // },
+    mounted() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.userstate = true; // User is logged in
+                this.uid = user.uid;
+            } else {
+                this.userstate = false; // User is not logged in
+                this.uid = '';
+            }
+        })
+    },
 
     props: {
         project: Object,
@@ -111,7 +111,12 @@ export default {
 
         goToProjProfile() {
             this.$router.push({ name: 'ProjProfile', params: { id: this.project.id } });
+        },
+
+        goToLogin() {
+            this.$router.push({ name: 'Auth' })
         }
+
     },
     computed: {
         daysToDeadline(){
@@ -124,7 +129,7 @@ export default {
 
 <style>
 body {
-    background-color: #f8f8f8;
+    background-color: #ffffff;
     margin: 0;
     padding: 10px;
 }
@@ -201,7 +206,7 @@ body {
 
 .bookmark-icon img {
     height:20px;
-    width:18px;
+    width:27px;
     padding-right:10px;
     cursor: pointer;
 }
