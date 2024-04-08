@@ -72,7 +72,6 @@ export default {
 </script>
 
 <template>
-  <body>
     <div id="flex-container">
       <div id="title-container">
         <div id="title">
@@ -119,7 +118,6 @@ export default {
         </div>
       </div>
     </div>
-  </body>
 </template>
 
 
@@ -196,6 +194,7 @@ mark.black {
 .projectCategory {
   color: black;
   font-weight: 300px;
+  height: 50px;
 }
 
 .projects-cart {
@@ -203,7 +202,7 @@ mark.black {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 25px;
   overflow: scroll;
 }
 </style>

@@ -157,7 +157,7 @@ export default {
     text-align: center;
 
     font-size: 45px;
-    font-family: Garamond, serif;
+    font-family: Inter;
     font-weight: 600;
 
     word-wrap: break-word;
