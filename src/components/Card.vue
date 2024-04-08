@@ -1,5 +1,5 @@
 <template>
-    <body>
+    
         <div v-if = "userstate" class="card" @click="goToProjProfile">
             <div class="card-image">
                 <img v-bind:src="imageUrl" alt="Very cool picture">
@@ -19,7 +19,7 @@
                         <span>{{ daysToDeadline }} days to go</span>
                     </div>
                     <div class = "bookmark-icon">
-                        <img @click.stop = "toggleBookmark" v-if = "bookmarked" src = "../assets/bookmark.png"/>
+                        <img @click.stop = "toggleBookmark" v-if = "this.bookmarked" src = "../assets/bookmark.png"/>
                         <img @click.stop = "toggleBookmark" v-else src = "../assets/bookmark-white.png"/>
                     </div>
                 </div>
@@ -41,13 +41,16 @@
                 </div>
 
                 <div class="card-footer">
-                    <div class="footer-section time">
+                    <div v-if = "this.project.projectCompleted" class="footer-section time">
+                        <span>Project Completed</span>
+                    </div>
+                    <div v-else class="footer-section time">
                         <span>{{ daysToDeadline }} days to go</span>
                     </div>
                 </div>
             </div>
         </div>
-    </body>
+   
 </template>
 
 <script>
@@ -56,7 +59,7 @@ import firebase from '../uifire.js';
 import 'firebase/compat/auth';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, doc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, getDoc, doc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 const db = getFirestore(firebaseApp);
 
@@ -65,20 +68,42 @@ export default {
         return {
             userstate: false,
             uid: '',
-            bookmarked: false
+            bookmarked: false,
+            userProfile: null,
+            savedProjects:[]
         }
     },
 
-    mounted() {
-        firebase.auth().onAuthStateChanged((user) => {
+    async mounted() {
+        firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 this.userstate = true; // User is logged in
                 this.uid = user.uid;
+                const userRef = doc(db, 'User Information', this.uid);
+                const userSnap = await getDoc(userRef);
+                this.userProfile = userSnap.data();
+                this.savedProjects = this.userProfile.savedProjects;
+                this.bookmarked = this.savedProjects.includes(this.project.id);
             } else {
                 this.userstate = false; // User is not logged in
                 this.uid = '';
+                this.userProfile = null;
+                this.savedProjects = [];
             }
         })
+        if (this.project.projectEnd.toDate().getTime() < new Date().getTime()) {
+            const docRef = doc(db, 'Project Collection', this.project.id);
+            await updateDoc(docRef, {projectCompleted: true});
+            let hostID = this.project.projectHost;
+            const hostRef = doc(db, 'User Information', hostID);
+            await updateDoc(hostRef, {currentProjects: arrayRemove(this.project.projectID)});
+            await updateDoc(hostRef, {pastProjects: arrayUnion(this.project.projectID)});
+            this.project.projectMembers.forEach(async (memberID) => {
+                let memberRef = doc(db, 'User Information', memberID);
+                await updateDoc(memberRef, {currentProjects: arrayRemove(this.project.projectID)});
+                await updateDoc(memberRef, {pastProjects: arrayUnion(this.project.projectID)});
+            })
+        }
     },
 
     props: {
@@ -90,8 +115,8 @@ export default {
             this.bookmarked = !this.bookmarked;
             if (this.bookmarked) {
                 try {
-                    const docRef = doc(db, 'User Information', this.uid);
-                    await updateDoc(docRef, {savedProjects: arrayUnion(this.project.projectID)})
+                    let userRef = doc(db, 'User Information', this.uid);
+                    await updateDoc(userRef, {savedProjects: arrayUnion(this.project.projectID)});
                 }
 
                 catch(error) {
@@ -99,8 +124,8 @@ export default {
                 }
             } else {
                 try {
-                    const docRef = doc(db, 'User Information', this.uid);
-                    await updateDoc(docRef, {savedProjects: arrayRemove(this.project.projectID)})
+                    let userRef = doc(db, 'User Information', this.uid);
+                    await updateDoc(userRef, {savedProjects: arrayRemove(this.project.projectID)})
                 }
 
                 catch(error) {
@@ -127,12 +152,8 @@ export default {
 </script>
 
 
-<style>
-body {
-    background-color: #ffffff;
-    margin: 0;
-    padding: 10px;
-}
+<style scoped>
+
 
 .card {
     border: 1px solid rgb(218, 220, 224);

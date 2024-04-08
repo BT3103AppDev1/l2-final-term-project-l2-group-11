@@ -1,10 +1,56 @@
 <template>
     <section class="projects">
       <div class="intro"><span id="title">Our Projects</span></div>
+      <div class="projects-container">
+        <div class="projects-cart">
+          <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+        </div>
+    </div>
     </section>
-  </template>
-  
-  <style scoped>
+</template>
+
+<script>
+import Card from './Card.vue';
+import firebaseApp from '../Firebase.js';
+import { getFirestore } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+
+const db = getFirestore(firebaseApp);
+
+export default {
+  components: {
+    Card
+  },
+
+  data() {
+    return {
+      projects: []
+    }
+  },
+
+  mounted() {
+    this.fetchProjects();
+  },
+
+  methods: {
+    async fetchProjects() {
+      try {
+        const listOfProjects = await getDocs(collection(db, "Project Collection"))
+        listOfProjects.forEach((doc) => {
+          let project = doc.data();
+          project.id = doc.id;
+          this.projects.push(project);
+        });
+        this.filteredProjects = this.projects;
+      } catch (error) {
+        console.error("Error fetching projects: ", error);
+      }
+    },
+  }
+}
+</script>
+
+<style scoped>
   .intro {
     text-align: center;
   }
@@ -23,4 +69,18 @@
    
     word-wrap: break-word;
   }
-  </style>
+  .projects-cart {
+  height: 350px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow: scroll;
+  }
+  .projects-container {
+  margin-left: 50px;
+  font-size: 25px;
+  font-weight: 550px;
+  }
+
+</style>
