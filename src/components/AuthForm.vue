@@ -67,14 +67,35 @@ export default {
         },
         async setAuthOptionToGmail() {
             this.authOption = "Gmail";
-            const provider = await new GoogleAuthProvider();
-            let success = await signInWithPopup(getAuth(), provider);
-            if (success) {
-                this.$router.push("/");
-            } else {
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(getAuth(), provider);
+                console.log(result.user.email); // Logging the user's email
+
+                // The signed-in user info.
+                const user = result.user;
+
+
+                // Check if this user exists in Firestore
+                const docRef = doc(db, "User Information", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) {
+                    // New user - Create a new entry in Firestore
+                    await setDoc(doc(db, "User Information", user.uid), {
+                        email: user.email,
+                        // You can add other user details here from the Google user object
+                    });
+                    // Redirect to complete registration if needed
+                    this.$router.push({name: 'SignUpQuestionaire', params: { userId: user.uid } });
+                } else {
+                    // Existing user - Redirect to main page or dashboard
+                    this.$router.push("/"); // Assuming "/dashboard" is the route you want
+                }
+            } catch (error) {
+                console.error("Authentication with Google failed", error);
                 this.$router.push("/auth");
             }
-
         }
     }
 }
