@@ -1,24 +1,73 @@
 <script>
+import Card from './Card.vue';
 import firebaseApp from '../Firebase.js';
+import firebase from '../uifire.js';
+import 'firebase/compat/auth';
 import { ref, onMounted } from 'vue';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+const db = getFirestore(firebaseApp);
 
 export default {
+
+    components: {
+        Card
+    },
 
     props: ['userId'],
 
     data() {
-
         return {
-            // pageBackgroundColor: '#FDF8F6' 
-            
+            activeTab: 'my-projects', // Default active tab
+            userstate: false,
+            uid: '',
+            userProfile: null,
+            hostedProjects: [],
+            currentProjects: [],
+            pastProjects: [],
+            savedProjects: [],  
         };
+    },
 
+    mounted() {
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                this.userstate = true; // User is logged in
+                this.uid = user.uid;
+                const userRef = doc(db, 'User Information', this.uid);
+                const userSnap = await getDoc(userRef);
+                this.userProfile = userSnap.data();
+                this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects);
+                this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects);
+                this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
+                this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
+            } else {
+                this.userstate = false;
+            }
+        })
     },
 
     methods: {
+
+        setActiveTab(tab) {
+            this.activeTab = tab;
+        },
+
+        convertIdToProjects(idList) {
+            let newProjectList = []
+            for (let i = 0; i<idList.length; i++) {
+                let docRef = doc(db, 'Project Collection', idList[i]);
+                let docSnap = getDoc(docRef);
+                docSnap.then(function (value) {
+                    let project = value.data();
+                    project.id = value.id;
+                    newProjectList.push(project);
+                })
+            };
+            return newProjectList;
+        }, 
 
         //method to trigger file input
         triggerEditProfileUpload() {
@@ -164,7 +213,6 @@ export default {
 
                 </div> <!--end of skills description-->
 
-
                 <div class = "socialMediaIconsHeading">
 
                     <button id = 'reviewsButton'>Reviews</button>
@@ -195,12 +243,35 @@ export default {
         
         </div> <!--end of profile section-->
 
-
-        <div id = "project-container">
-
+        <div class="tabs">
+            <span :class="{active: activeTab === 'my-projects'}" @click="setActiveTab('my-projects')">My Projects</span>
+            <span :class="{active: activeTab === 'current-projects'}" @click="setActiveTab('current-projects')">Current Projects</span>
+            <span :class="{active: activeTab === 'past-projects'}" @click="setActiveTab('past-projects')">Past Projects</span>
+            <span :class="{active: activeTab === 'saved-projects'}" @click="setActiveTab('saved-projects')">Saved Projects</span>
         </div>
 
-
+        <div id = "project-container">
+            <div v-show="activeTab === 'my-projects'" class="projects-container">
+                <div class="projects-cart">
+                    <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+                </div>
+            </div>
+            <div v-show="activeTab === 'current-projects'" class="projects-container">
+                <div class="projects-cart">
+                    <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+                </div>
+            </div>
+            <div v-show="activeTab === 'past-projects'" class="projects-container">
+                <div class="projects-cart">
+                    <Card v-for="project in pastProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+                </div>
+            </div>
+            <div v-show="activeTab === 'saved-projects'" class="projects-container">
+                <div class="projects-cart">
+                    <Card v-for="project in savedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+                </div>
+            </div>
+        </div>
     </div> <!--end of main container-->
 </template>
 
@@ -210,7 +281,7 @@ export default {
 .main-container {
     display: flex;
     flex-direction: column; /* Stack children vertically */
-    /* justify-content: space-between; */
+    justify-content: space-between; /* Space out children */
     min-height: 100vh; /* Minimum height to fill the viewport */
     padding-top: 20px; /* Add padding at the top if needed */
 
@@ -234,7 +305,7 @@ export default {
     align-items: flex-start;
     background-color: #FDF8F6;
     width: 3000px;
-    height: 950px;
+    height: 1000px;
 }
 
 #username-bio {
@@ -290,8 +361,8 @@ export default {
 
 .tags span {
   display: inline-block;
-  margin: /*0.5rem*/ 10px;
-  padding: /*1rem 3rem*/ 20px 40px;
+  margin: 10px;
+  padding: 20px 40px;
   background-color: #D9D9D9; /* Example background color */
   color: #333; /* Example text color */
   cursor: default;
@@ -394,6 +465,40 @@ export default {
     outline: none; /* Remove focus outline */
     transition: background-color 0.3s ease;
     margin-bottom: 50px;
+}
+
+.tabs {
+    padding-left: 40px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.tabs span {
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: 500;
+    font-size: medium;
+    border-bottom: 2px solid transparent; /* Visual indicator for non-active tabs */
+}
+  
+.tabs span.active {
+    border-bottom: 2px solid #FF6A3D /* Visual indicator for the active tab */
+}
+
+.projects-container {
+  margin-left: 50px;
+  font-size: 25px;
+  font-weight: 550px;
+}
+
+.projects-cart {
+  height: 350px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 25px;
+  overflow: scroll;
 }
 
 </style>
