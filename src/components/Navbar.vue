@@ -66,8 +66,14 @@
                 this.uid = user.uid;
                 const docRef = doc(db, "User Information", user.uid);
                 const docSnap = await getDoc(docRef);
-                this.userProfile = docSnap.data();
-                this.profileImageUrl = this.userProfile.profileImageUrl;
+                if (docSnap.exists() && docSnap.data().questionaireFilled !== true) {
+                  this.$router.push({name: 'SignUpQuestionaire', params: {userId: this.uid}});
+                } else {
+                  this.profileImageUrl = docSnap.exists() ? docSnap.data().profileImageUrl : '';
+                }
+
+                // this.userProfile = docSnap.data();
+                // this.profileImageUrl = this.userProfile.profileImageUrl;
             } else {
                 this.isLoggedIn = false;
                 this.uid = '';

@@ -49,6 +49,7 @@ export default {
 
                     await setDoc(userDocRef, {
                         email: this.EmailAddress,
+                        questionaireFilled: false,
                     });
                     //store email address in the doc above.
 

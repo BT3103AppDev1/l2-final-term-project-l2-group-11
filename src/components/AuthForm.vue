@@ -85,6 +85,7 @@ export default {
                     await setDoc(doc(db, "User Information", user.uid), {
                         email: user.email,
                         // You can add other user details here from the Google user object
+                        questionaireFilled: false,
                     });
                     // Redirect to complete registration if needed
                     this.$router.push({name: 'SignUpQuestionaire', params: { userId: user.uid } });

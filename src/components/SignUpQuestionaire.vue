@@ -140,6 +140,7 @@ export default {
                 linkedin: this.formData.linkedin,
                 instagram: this.formData.instagram,
                 telegram: this.formData.telegram,
+                filledQuestionaire: true,
             }, {merge: true}); //merge true is used to not update the elements that are already in the document
             console.log("document successfully updated!")
             alert("Your Profile has been Successfully Created!")
