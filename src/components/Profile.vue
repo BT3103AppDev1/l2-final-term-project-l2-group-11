@@ -18,10 +18,6 @@ export default {
 
     },
 
-    // mounted() {
-    //     this.setBodyBackGroundColor(this.pageBackgroundColor); //not working
-    // },
-
     methods: {
 
         //method to trigger file input
@@ -168,7 +164,10 @@ export default {
 
                 </div> <!--end of skills description-->
 
+
                 <div class = "socialMediaIconsHeading">
+
+                    <button id = 'reviewsButton'>Reviews</button>
 
                     <h2 class="socialMediaHeading">Social Media</h2> <!-- Heading for the icons -->
 
@@ -211,7 +210,7 @@ export default {
 .main-container {
     display: flex;
     flex-direction: column; /* Stack children vertically */
-    justify-content: space-between; /* Space out children */
+    /* justify-content: space-between; */
     min-height: 100vh; /* Minimum height to fill the viewport */
     padding-top: 20px; /* Add padding at the top if needed */
 
@@ -222,13 +221,20 @@ export default {
     flex-direction: row;
 }
 
+#project-container {
+    display:flex;
+    flex-direction: column;
+    color: white;
+    min-height: 100vh;
+}
+
 #profile-section {
     display: flex;
     flex-direction: column; 
     align-items: flex-start;
     background-color: #FDF8F6;
     width: 3000px;
-    height: 1000px;
+    height: 950px;
 }
 
 #username-bio {
@@ -277,15 +283,15 @@ export default {
     padding: 10px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
     text-transform: uppercase; /* Uppercase text */
     cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 1.5rem; /* Button text size */
+    font-size: 25px; /* Button text size */
     outline: none; /* Remove focus outline */
     transition: background-color 0.3s ease;
 }
 
 .tags span {
   display: inline-block;
-  margin: 0.5rem;
-  padding: 1rem 3rem;
+  margin: /*0.5rem*/ 10px;
+  padding: /*1rem 3rem*/ 20px 40px;
   background-color: #D9D9D9; /* Example background color */
   color: #333; /* Example text color */
   cursor: default;
@@ -373,6 +379,21 @@ export default {
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
+}
+
+#reviewsButton {
+    background-color: #FF6A3D; /* Orange background color */
+    color: white; /* White text */
+    font-weight: bold; /* Make the text bold */
+    border: none; /* No border */
+    border-radius: 20px; /* Rounded corners */
+    padding: 15px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
+    text-transform: uppercase; /* Uppercase text */
+    cursor: pointer; /* Change mouse pointer to indicate button */
+    font-size: 1.5rem; /* Button text size */
+    outline: none; /* Remove focus outline */
+    transition: background-color 0.3s ease;
+    margin-bottom: 50px;
 }
 
 </style>
