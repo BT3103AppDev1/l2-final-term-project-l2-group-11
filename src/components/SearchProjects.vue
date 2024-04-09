@@ -86,17 +86,21 @@ export default {
 
       <div v-if = "searchInput.length == 0" class="projects-container">
         <div class="projectCategory">
-          <p>Mobile App Development</p>
-        </div>
-        <div class="projects-cart">
-          <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            <div class="project-category-title">
+                <h4>Mobile App Development</h4>
+            </div>
+            <div class="projects-cart">
+            <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            </div>
         </div>
 
         <div class="projectCategory">
-          <p>Machine Learning</p>
-        </div>
-        <div class="projects-cart">
-          <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            <div class="project-category-title">
+                <h4>Machine Learning</h4>
+            </div>
+            <div class="projects-cart">
+                <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            </div>
         </div>
       </div>
 
@@ -124,35 +128,41 @@ export default {
 <style scoped>
 
 #flex-container {
-  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-}
-
-#navBar {
-  height: 40px
-}
-
-#title {
-  margin-top: 15px;
-  font-size: 35px;
-  font-weight: 650;
-  text-align: center;
+  align-items:center;
+  height:100%;
+  width:100%;
+  background-color: white;
 }
 
 #title-container {
-  height: 150px;
+  height: 250px;
+  width:100%;
   background-color: #ffece4;
-  text-align: center
+  text-align: center;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items:center;
+}
+
+
+#title {
+  font-size: 35px;
+  font-weight: 650;
+  text-align: center;
+  color:black;
 }
 
 #search-bar {
   margin-top: 20px;
   display: flex;
   justify-content: center;
-  gap: 50px;
-  align-items: baseline;
+  gap: 30px;
+  align-items: center;
+  width:100%;
 }
 
 #rounded-search {
@@ -162,7 +172,7 @@ export default {
   outline: none;
   font-size: 16px;
   width: 600px;
-  height: 30px;
+  height: 40px;
 }
 
 #createProjectButton, #searchProjectButton {
@@ -171,8 +181,13 @@ export default {
   font-size: 16px;
   color: white;
   border: none;
-  height: 30px;
+  height: 40px;
   cursor: pointer;
+}
+
+#createProjectButton:hover, #searchProjectButton:hover {
+    background-color: orange;
+
 }
 
 mark.orange {
@@ -186,23 +201,46 @@ mark.black {
 }
 
 .projects-container {
-  margin-left: 50px;
-  font-size: 25px;
-  font-weight: 550px;
+  width:100%;
+  padding-left:5%;
+  display:flex;
+  flex-direction:column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow:scroll;
 }
 
-.projectCategory {
-  color: black;
-  font-weight: 300px;
-  height: 50px;
+.projects-container .projectCategory {
+    display:flex;
+    flex-direction:column;
+    justify-content: flex-start;
+    align-items: center;
+    height:400px;
+    padding-top:20px;
+    width:100%;
+}
+
+.project-category-title {
+    width:100%;
+    font-size: 25px;
+    font-weight: 550;
+    color:black;
+    display:flex;
+    flex-direction:row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .projects-cart {
-  height: 350px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 25px;
-  overflow: scroll;
+    width:100%;
+    height: 350px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 30px;
+    overflow: scroll;
+    padding-top:5px;
 }
+
 </style>

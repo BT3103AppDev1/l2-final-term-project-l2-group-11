@@ -3,8 +3,9 @@ import Authentication from '../views/AuthenticationPage.vue'
 import About from '../views/About.vue'
 import Project from '../views/Project.vue'
 import ProjProfile from '../components/ProjProfile.vue'
-import SignUpQuestionaire from '../components/SignUpQuestionaire.vue'
+import SignUpQuestionaire from '../views/SignUpQuestionaire.vue'
 import Profile from '../components/Profile.vue'
+import Reviews from "../views/ReviewsPage.vue"
 
 const routes = [
     {
@@ -18,12 +19,12 @@ const routes = [
         component: Project
     },
     {
-        path: '/project/:id',
+        path: '/project/:id/:varibale',
         name: 'ProjProfile',
         component: ProjProfile
     },
     {
-        path: '/auth',
+        path: '/auth/:state',
         name: 'Auth',
         component: Authentication,
     },
@@ -38,6 +39,11 @@ const routes = [
         name: 'Profile',
         component: Profile,
         props:true 
+    },
+    {
+        path:'/reviews',
+        name: 'Reviews',
+        component: Reviews
     }
 ]
 
