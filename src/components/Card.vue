@@ -139,7 +139,7 @@ export default {
         },
 
         goToLogin() {
-            this.$router.push({ name: 'Auth' })
+            this.$router.push("/auth/register")
         }
 
     },

@@ -10,10 +10,11 @@
             <div class = "link">
                 <router-link to = "/" class = "router-link" > About </router-link> 
                 <router-link to = "/project" class = "router-link" > Project </router-link> 
+                <router-link to = "/reviews" class = "router-link" > Review </router-link> 
             </div>
             <div v-if = "!isLoggedIn" class = "login-register-buttons">
-                <router-link to = "/auth" class = "router-link">Login</router-link>
-                <router-link to = "/auth" class = "router-link">Register</router-link>
+               <router-link to = "/auth/login" class = "router-link">Login</router-link>
+               <router-link to = "/auth/register" class = "router-link">Register</router-link>
             </div>
             <div v-else id="profile-menu" @click="toggleDropdown" class="profile-dropdown">
               <img v-bind:src="profileImageUrl" class="profile-icon" />
@@ -66,14 +67,8 @@
                 this.uid = user.uid;
                 const docRef = doc(db, "User Information", user.uid);
                 const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().questionaireFilled !== true) {
-                  this.$router.push({name: 'SignUpQuestionaire', params: {userId: this.uid}});
-                } else {
-                  this.profileImageUrl = docSnap.exists() ? docSnap.data().profileImageUrl : '';
-                }
-
-                // this.userProfile = docSnap.data();
-                // this.profileImageUrl = this.userProfile.profileImageUrl;
+                this.userProfile = docSnap.data();
+                this.profileImageUrl = this.userProfile.profileImageUrl;
             } else {
                 this.isLoggedIn = false;
                 this.uid = '';
