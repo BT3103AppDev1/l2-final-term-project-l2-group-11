@@ -99,6 +99,10 @@ export default {
                 console.error("Error uploading image: ", error);
             }
         },
+
+        editProfile() {
+            this.$router.push({name: 'EditProfile', params: {userId: this.userId }});
+        },
     },
 
     setup(props) {
@@ -170,9 +174,9 @@ export default {
                         <img v-if="userData.profileImageUrl" :src="userData.profileImageUrl" alt="Profile Preview">
                         <h2 v-else>p</h2>
                     </div>
-                    <button id = "edit-profile" @click = "triggerEditProfileUpload"> Edit Profile </button>
+                    <button id = "edit-profile" @click = "editProfile"> Edit Profile </button>
                     <!-- Hidden file input for editing profile -->
-                    <input type="file" id="editProfileUpload" ref="editProfileUpload" @change="handleEditProfileUpload" style="display: none;">
+                    <!-- <input type="file" id="editProfileUpload" ref="editProfileUpload" @change="handleEditProfileUpload" style="display: none;"> -->
                 </div>
 
 
@@ -278,227 +282,226 @@ export default {
 
 <style scoped>
 
-.main-container {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    justify-content: space-between; /* Space out children */
-    min-height: 100vh; /* Minimum height to fill the viewport */
-    padding-top: 20px; /* Add padding at the top if needed */
+    .main-container {
+        display: flex;
+        flex-direction: column; /* Stack children vertically */
+        justify-content: space-between; /* Space out children */
+        min-height: 100vh; /* Minimum height to fill the viewport */
+        padding-top: 20px; /* Add padding at the top if needed */
 
-}
+    }
 
-#photo-userbio {
+    #photo-userbio {
+        display: flex;
+        flex-direction: row;
+    }
+
+    #project-container {
+        display:flex;
+        flex-direction: column;
+        color: white;
+        min-height: 100vh;
+    }
+
+    #profile-section {
+        display: flex;
+        flex-direction: column; 
+        align-items: flex-start;
+        background-color: #FDF8F6;
+        width: 3000px;
+        height: 1000px;
+    }
+
+    #username-bio {
+        margin-left: 80px;
+        font-size: 35px;
+        margin-top: 50px;
+        margin-bottom: 500px;
+    }
+
+    .strong-bold {
+        font-weight:650;
+    }
+
+    #project-container {
+        background-color: white;
+        height: 500px;
+    }
+
+    #photo-editButton {
+        display: flex;
+        flex-direction: column; /* Stack the children (image and button) vertically */
+        align-items: center; /* Center align the children */
+        justify-content: center; /* Align children to the start of the flex container */
+        margin-left: 200px;
+        margin-bottom: 550px;
+    }
+
+    #photo-placeholder {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%; /* Keeps the circular shape */
+        background-color: #ccc;
+        border: 5px solid black;
+        margin-top: 60px;
+        margin-bottom: 10px;
+        overflow: hidden; /* Ensures no overflow outside the circular boundary */
+        position: relative; /* Position relative to allow absolute positioning inside */
+    }
+
+    #edit-profile {
+        background-color: #FF6A3D; /* Orange background color */
+        color: white; /* White text */
+        font-weight: bold; /* Make the text bold */
+        border: none; /* No border */
+        border-radius: 20px; /* Rounded corners */
+        padding: 10px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
+        text-transform: uppercase; /* Uppercase text */
+        cursor: pointer; /* Change mouse pointer to indicate button */
+        font-size: 25px; /* Button text size */
+        outline: none; /* Remove focus outline */
+        transition: background-color 0.3s ease;
+    }
+
+    .tags span {
+    display: inline-block;
+    margin: 10px;
+    padding: 20px 40px;
+    background-color: #D9D9D9; /* Example background color */
+    color: #333; /* Example text color */
+    cursor: default;
+    font-size:25px;
+    }
+
+    .interests h2, .skills h2 {
+        font-weight:650;
+        font-size:35px;
+    }
+
+
+    #skills-description {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        bottom: 1000px;
+        margin-left: 530px;
+        margin-top: 450px;
+        width: 50%;
+        flex-grow: 2; /* give it flexibility to grow as needed */
+    }
+
+    #skills-interests {
+        margin-top: 10px;
+    }
+
+    #description {
+        margin-top: 30px;
+        width: 90%;
+    }
+
+
+    #description h1 {
+        font-weight: 650;
+        font-size: 35px
+    }
+
+    #description h3 {
+        font-size: 30px
+    }
+
+
+    #photo-placeholder img {
+        width: 100%; /* Make image fill the container */
+        height: auto; /* Maintain aspect ratio */
+        position: absolute; /* Position it over placeholder */
+        top: 50%; /* Align the top edge of the image in the center of the container */
+        left: 50%; /* Align the left edge of the image in the center of the container */
+        transform: translate(-50%, -50%); /* Offset the image back to center properly */
+    }
+
+    .socialMediaIcons img {
+        width: 100px; /* Set a fixed width for all icons */
+        height: 100px; /* Set a fixed height for all icons */
+        object-fit: contain; /* This ensures that the entire image is visible, scaled to fit within the frame */
+        margin: 0 10px; /*add space between each email */ 
+    }
+
+    .socialMediaIcons {
+        display: flex;
+        justify-content: flex-start;
+        text-align: center;
+    }
+    .socialMediaHeading {
+    font-size: 30px; /* Example font size, adjust as necessary */
+    font-weight: bold; /* If you want the heading to be bold */
+    margin-bottom: 10px; /* Space between the heading and the icons */
+    }
+
+    .socialMediaIconsHeading {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: flex-start;
+        bottom: 500px;
+        right: 350px;
+    }
+
+    #socialMediaWrapper {
+        display:flex;
+        flex-direction: row;
+        width: 100%;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    #reviewsButton {
+        background-color: #FF6A3D; /* Orange background color */
+        color: white; /* White text */
+        font-weight: bold; /* Make the text bold */
+        border: none; /* No border */
+        border-radius: 20px; /* Rounded corners */
+        padding: 15px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
+        text-transform: uppercase; /* Uppercase text */
+        cursor: pointer; /* Change mouse pointer to indicate button */
+        font-size: 1.5rem; /* Button text size */
+        outline: none; /* Remove focus outline */
+        transition: background-color 0.3s ease;
+        margin-bottom: 50px;
+    }
+
+    .tabs {
+        padding-left: 40px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+
+    .tabs span {
+        cursor: pointer;
+        padding-left: 10px;
+        padding-right: 10px;
+        font-weight: 500;
+        font-size: medium;
+        border-bottom: 2px solid transparent; /* Visual indicator for non-active tabs */
+    }
+    
+    .tabs span.active {
+        border-bottom: 2px solid #FF6A3D /* Visual indicator for the active tab */
+    }
+
+    .projects-container {
+    margin-left: 50px;
+    font-size: 25px;
+    font-weight: 550px;
+    }
+
+    .projects-cart {
+    height: 350px;
     display: flex;
     flex-direction: row;
-}
-
-#project-container {
-    display:flex;
-    flex-direction: column;
-    color: white;
-    min-height: 100vh;
-}
-
-#profile-section {
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    background-color: #FDF8F6;
-    width: 3000px;
-    height: 1000px;
-}
-
-#username-bio {
-    margin-left: 80px;
-    font-size: 35px;
-    margin-top: 50px;
-    margin-bottom: 500px;
-}
-
-.strong-bold {
-    font-weight:650;
-}
-
-#project-container {
-    background-color: white;
-    height: 500px;
-}
-
-#photo-editButton {
-    display: flex;
-    flex-direction: column; /* Stack the children (image and button) vertically */
-    align-items: center; /* Center align the children */
-    justify-content: center; /* Align children to the start of the flex container */
-    margin-left: 200px;
-    margin-bottom: 550px;
-}
-
-#photo-placeholder {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%; /* Keeps the circular shape */
-    background-color: #ccc;
-    border: 5px solid black;
-    margin-top: 60px;
-    margin-bottom: 10px;
-    overflow: hidden; /* Ensures no overflow outside the circular boundary */
-    position: relative; /* Position relative to allow absolute positioning inside */
-}
-
-#edit-profile {
-    background-color: #FF6A3D; /* Orange background color */
-    color: white; /* White text */
-    font-weight: bold; /* Make the text bold */
-    border: none; /* No border */
-    border-radius: 20px; /* Rounded corners */
-    padding: 10px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
-    text-transform: uppercase; /* Uppercase text */
-    cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 25px; /* Button text size */
-    outline: none; /* Remove focus outline */
-    transition: background-color 0.3s ease;
-}
-
-.tags span {
-  display: inline-block;
-  margin: 10px;
-  padding: 20px 40px;
-  background-color: #D9D9D9; /* Example background color */
-  color: #333; /* Example text color */
-  cursor: default;
-  font-size:25px;
-}
-
-.interests h2, .skills h2 {
-    font-weight:650;
-    font-size:35px;
-}
-
-
-#skills-description {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    bottom: 1000px;
-    margin-left: 530px;
-    margin-top: 450px;
-    width: 50%;
-    flex-grow: 2; /* give it flexibility to grow as needed */
-}
-
-#skills-interests {
-    margin-top: 10px;
-}
-
-#description {
-    margin-top: 30px;
-    width: 90%;
-}
-
-
-#description h1 {
-    font-weight: 650;
-    font-size: 35px
-}
-
-#description h3 {
-    font-size: 30px
-}
-
-
-#photo-placeholder img {
-    width: 100%; /* Make image fill the container */
-    height: auto; /* Maintain aspect ratio */
-    position: absolute; /* Position it over placeholder */
-    top: 50%; /* Align the top edge of the image in the center of the container */
-    left: 50%; /* Align the left edge of the image in the center of the container */
-    transform: translate(-50%, -50%); /* Offset the image back to center properly */
-}
-
-.socialMediaIcons img {
-    width: 100px; /* Set a fixed width for all icons */
-    height: 100px; /* Set a fixed height for all icons */
-    object-fit: contain; /* This ensures that the entire image is visible, scaled to fit within the frame */
-    margin: 0 10px; /*add space between each email */ 
-}
-
-.socialMediaIcons {
-    display: flex;
     justify-content: flex-start;
-    text-align: center;
-}
-.socialMediaHeading {
-  font-size: 30px; /* Example font size, adjust as necessary */
-  font-weight: bold; /* If you want the heading to be bold */
-  margin-bottom: 10px; /* Space between the heading and the icons */
-}
-
-.socialMediaIconsHeading {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    justify-content: flex-start;
-    bottom: 500px;
-    right: 350px;
-}
-
-#socialMediaWrapper {
-    display:flex;
-    flex-direction: row;
-    width: 100%;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-#reviewsButton {
-    background-color: #FF6A3D; /* Orange background color */
-    color: white; /* White text */
-    font-weight: bold; /* Make the text bold */
-    border: none; /* No border */
-    border-radius: 20px; /* Rounded corners */
-    padding: 15px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
-    text-transform: uppercase; /* Uppercase text */
-    cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 1.5rem; /* Button text size */
-    outline: none; /* Remove focus outline */
-    transition: background-color 0.3s ease;
-    margin-bottom: 50px;
-}
-
-.tabs {
-    padding-left: 40px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-}
-
-.tabs span {
-    cursor: pointer;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-weight: 500;
-    font-size: medium;
-    border-bottom: 2px solid transparent; /* Visual indicator for non-active tabs */
-}
-  
-.tabs span.active {
-    border-bottom: 2px solid #FF6A3D /* Visual indicator for the active tab */
-}
-
-.projects-container {
-  margin-left: 50px;
-  font-size: 25px;
-  font-weight: 550px;
-}
-
-.projects-cart {
-  height: 350px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 25px;
-  overflow: scroll;
-}
-
+    gap: 25px;
+    overflow: scroll;
+    }
 </style>
