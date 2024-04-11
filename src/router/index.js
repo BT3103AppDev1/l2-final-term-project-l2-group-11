@@ -53,6 +53,12 @@ const routes = [
         name: 'EditProfile',
         component: EditProfile,
         props: true
+    },
+    {
+        path:'/ManagePrj/:id',
+        name: 'ManagePrj',
+        component: ManagePrj,
+    
     }
 ]
 
