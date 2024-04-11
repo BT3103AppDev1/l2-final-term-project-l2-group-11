@@ -1,45 +1,65 @@
 <template>
-
-        <section class="heading-section">
-            <div class="bg"></div>
-            <img class="pic" src="./icons/home-pic.png" />
-            <div class="frame">
-                <div class="text">
-                    <div class="heading">
-                        <span id="collab">Collab and Conquer <br> </span>
-                        <span id="meet"> Meet like-minded individuals <br> to work on project</span>
-                    </div>
-                    <div class="subtitle">
-                        Enhance your porforlio with anyone, anywhere, anytime
-                    </div>
-                    <button id="join" type="button" v-on:click="gotoAuth">Join our community</button>
-
+    <section class="heading-section">
+        <div class="bg"></div>
+        <img class="pic" src="./icons/home-pic.png" />
+        <div class="frame">
+            <div class="text">
+                <div class="heading">
+                    <span id="collab">Collab and Conquer <br> </span>
+                    <span id="meet"> Meet like-minded individuals <br> to work on project</span>
                 </div>
+                <div class="subtitle">
+                    Enhance your porforlio with anyone, anywhere, anytime
+                </div>
+                <button v-if= "!userstate" id="join" type="button" @click="gotoAuth">Join our community</button>
             </div>
-        </section> <br>
+        </div>
+    </section> <br>
 
-        <section class="students-section">
-            <div class="students">
-                <div class="intro">
-                    <h1 id="title">Our Students </h1>
-                    <span id="description">Our students come from various institution</span>
-                </div>
-                <div class="logos">
-                    <img src='./icons/client1.png'>
-                    <img src='./icons/client2.png'>
-                    <img src='./icons/client3.png'>
-                    <img src='./icons/client4.png'>
-                    <img src='./icons/client5.png'>
-                    <img src='./icons/client6.png'>
-                    <img src='./icons/client7.png'>
-                </div>
+    <section class="students-section">
+        <div class="students">
+            <div class="intro">
+                <h1 id="title">Our Students </h1>
+                <span id="description">Our students come from various institution</span>
             </div>
-        </section>
- 
+            <div class="logos">
+                <img src='./icons/client1.png'>
+                <img src='./icons/client2.png'>
+                <img src='./icons/client3.png'>
+                <img src='./icons/client4.png'>
+                <img src='./icons/client5.png'>
+                <img src='./icons/client6.png'>
+                <img src='./icons/client7.png'>
+            </div>
+        </div>
+    </section>
 </template>
 
 <script>
+import firebase from '../uifire.js';
+import 'firebase/compat/auth';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 export default {
+    data() {
+        return {
+            userstate: false,
+            uid: '',
+        }
+    },
+    
+    async mounted() {
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                this.userstate = true; // User is logged in
+                this.uid = user.uid;
+            } else {
+                this.userstate = false; // User is not logged in
+                this.uid = '';
+            }
+        })
+    },
+    
     methods: {
         gotoAuth() {
             this.$router.push("/auth");

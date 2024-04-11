@@ -5,6 +5,7 @@ import Project from '../views/Project.vue'
 import ProjProfile from '../components/ProjProfile.vue'
 import SignUpQuestionaire from '../components/SignUpQuestionaire.vue'
 import Profile from '../components/Profile.vue'
+import ManagePrj from '../components/ManagePrj.vue'
 
 const routes = [
     {
@@ -20,7 +21,7 @@ const routes = [
     {
         path: '/project/:id',
         name: 'ProjProfile',
-        component: ProjProfile
+        component: ProjProfile, 
     },
     {
         path: '/auth',
@@ -38,6 +39,12 @@ const routes = [
         name: 'Profile',
         component: Profile,
         props:true 
+    }, 
+    {
+        path:'/ManagePrj/:id',
+        name: 'ManagePrj',
+        component: ManagePrj,
+    
     }
 ]
 

@@ -103,7 +103,7 @@
 
   .nav-logo {
     height:100%;
-    width:100%;
+    width:80%;
     display:flex;
     flex-direction:row;
     align-items:center;
@@ -138,11 +138,11 @@
     align-items:center;
     height:100%;
     color:#F5793B;
-    padding-left:100px;
+    /* padding-left:10px; */
   }
   .link .router-link {
     color: #F5793B;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: 600;
     background-color:white;
   }
