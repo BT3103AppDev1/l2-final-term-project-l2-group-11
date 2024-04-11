@@ -3,7 +3,7 @@
         <router-link to = "/" class = "nav-logo-link">
             <div class = "nav-logo">
                 <img class = "nav-kaizen-logo" src = "../assets/kaizenlogo.jpeg"/>
-                <img class = "nav-kaizen" src = "../assets/kaizen.jpeg"/>
+                <img class = "nav-kaizen" src = "../assets/Kaizen.jpeg"/>
             </div>
         </router-link>
         <div class = "link-button-container">
