@@ -6,7 +6,7 @@ import ProjProfile from '../components/ProjProfile.vue'
 import SignUpQuestionaire from '../components/SignUpQuestionaire.vue'
 import Profile from '../components/Profile.vue'
 import EditProfile from '../components/EditProfile.vue';
-
+import ManagePrj from '../components/ManagePrj.vue'
 
 const routes = [
     {
