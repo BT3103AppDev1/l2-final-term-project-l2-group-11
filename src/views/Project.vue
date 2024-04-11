@@ -1,5 +1,7 @@
 <template>
-    <SearchProjects/>
+    <div class = "project-page-wrapper">
+        <SearchProjects/>
+    </div>
 </template>
 
 <script>
@@ -33,5 +35,13 @@ export default {
 </script>
 
 <style scoped>
+.project-page-wrapper {
+    height:100%;
+    width:100%;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+}
 </style>
 

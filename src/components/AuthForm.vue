@@ -7,14 +7,19 @@ import ResetPasswordForm from "./ResetPasswordForm.vue";
 
 <template>
     <div class = "authForm-container">
-        <loadingSpinner v-show = "loading"/>
         <div class = "logo">
             <img class = "kaizen-logo" src = "../assets/kaizenlogo.jpeg"/>
-            <img class = "kaizen" src = "../assets/Kaizen.jpeg"/>
+            <img class = "kaizen" src = "../assets/Kaizen.jpeg"/> 
         </div>
         <div v-show = "!authOption" class = "auth-options-wrapper">
-            <button class = "auth-options" type = "button" v-on:click.prevent = "setAuthOptionToEmail">{{state}} with email</button>
-            <button class = "auth-options" type = "button" v-on:click.prevent = "setAuthOptionToGmail">{{state}} with Gmail</button>
+            <button class = "auth-options" type = "button" v-on:click.prevent = "setAuthOptionToEmail">
+                <img class = "kaizen-logo" src = "../assets/email.png"/>
+                <h4>{{state}} with Email</h4>
+            </button>
+            <button class = "auth-options" type = "button" v-on:click.prevent = "setAuthOptionToGmail">
+                <img class = "kaizen-logo" src = "../assets/gmail.png"/>
+                <h4>{{state}} with Gmail</h4>
+            </button>
         </div>
         <div v-if = "authOption === 'Email'" class = "auth-form-wrapper">
             <LoginForm v-if = "state == 'Login'" />
@@ -24,13 +29,19 @@ import ResetPasswordForm from "./ResetPasswordForm.vue";
         <div v-else class = "auth-form-wrapper">
 
         </div>
-        <button v-show = "authOption === 'Email'" type = "button" class = "auth-options" v-on:click.prevent = "setAuthOptionToGmail">{{state}} with Gmail</button>
-        <button v-show = "authOption === 'Gmail'" type = "button" class = "auth-options" v-on:click.prevent = "setAuthOptionToEmail">{{state}} with email</button>
+        <button v-show = "authOption === 'Email'" type = "button" class = "auth-options" v-on:click.prevent = "setAuthOptionToGmail">
+            <img class = "kaizen-logo" src = "../assets/gmail.png"/>
+            <h4>{{state}} with Gmail</h4>
+        </button>
+        <button v-show = "authOption === 'Gmail'" type = "button" class = "auth-options" v-on:click.prevent = "setAuthOptionToEmail">
+            <img class = "kaizen-logo" src = "../assets/email.png"/>
+            <h4>{{state}} with Email</h4>
+        </button>
         <div class = "other-auth-options">
-            <button type = "button" v-on:click = "toggleAuthState"> 
-                <h4 v-if = "state == 'Login'">Do not have an account? Register</h4>
-                <h4 v-else>Already have an account? Login </h4>
-            </button>
+
+            <router-link v-if = "state == 'Login'" to = "/auth/register" class = "router-link"><h4>Do not have an account? Register</h4></router-link>
+            <router-link v-else to = "/auth/login" class = "router-link" v-on:click.prevent = "toggleAuthState"><h4>Already have an account? Login </h4></router-link>
+           
             <button v-show = "state == 'Login'" type = "button" v-on:click = "updateStateToVerify"> 
                 <h4>Forget Password</h4>
             </button>
@@ -67,14 +78,47 @@ export default {
         },
         async setAuthOptionToGmail() {
             this.authOption = "Gmail";
-            const provider = await new GoogleAuthProvider();
-            let success = await signInWithPopup(getAuth(), provider);
-            if (success) {
-                this.$router.push("/");
-            } else {
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(getAuth(), provider);
+                console.log(result.user.email); // Logging the user's email
+
+                // The signed-in user info.
+                const user = result.user;
+
+
+                // Check if this user exists in Firestore
+                const docRef = doc(db, "User Information", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) {
+                    // New user - Create a new entry in Firestore
+                    await setDoc(doc(db, "User Information", user.uid), {
+                        email: user.email,
+                        // You can add other user details here from the Google user object
+                        questionaireFilled: false,
+                    });
+                    // Redirect to complete registration if needed
+                    this.$router.push({name: 'SignUpQuestionaire', params: { userId: user.uid } });
+                } else {
+                    // Existing user - Redirect to main page or dashboard
+                    this.$router.push("/"); // Assuming "/dashboard" is the route you want
+                }
+            } catch (error) {
+                console.error("Authentication with Google failed", error);
                 this.$router.push("/auth");
             }
-
+        }
+    },
+    components: {
+        loadingSpinner,
+        LoginForm,
+        RegisterForm,
+        ResetPasswordForm
+    },
+    watch : {
+        $route(to,from) {
+            this.state = this.$route.params.state === "login" ? "Login" : "Register";
         }
     }
 }
@@ -103,6 +147,7 @@ export default {
     margin-bottom:20px;
 }
 
+
 .kaizen-logo {
     height:70px;
     width:70px;
@@ -114,6 +159,7 @@ export default {
 }
 
 .auth-options-wrapper {
+    display:flex;
     flex-direction:column;
     justify-content: center;
     align-items: center;
@@ -121,11 +167,23 @@ export default {
 }
 
 .auth-options {
+    display:flex;
+    flex-direction:row;
+    justify-content: center;
+    align-items: center;
     height: 40px;
     margin-top: 10px;
     width:350px;
-    color:white;
-    background-color: orange;
+    background-color:white;
+    color: black;
+    border:1px black solid;
+    border-radius:2%;
+}
+
+.auth-options img {
+    height:20px;
+    width:20px;
+    margin-right:10px;
 }
 
 .other-auth-options {
@@ -143,6 +201,23 @@ export default {
     color:#F5793B;
     font-size: 13px;
     padding:0px;
+}
+
+.other-auth-options button:hover {
+    color:orange;
+}
+
+.other-auth-options .router-link {
+    outline:none;
+    border:none;
+    background-color: transparent;
+    color:#F5793B;
+    font-size: 13px;
+    padding:0px;
+}
+
+.other-auth-options .router-link:hover {
+    color:orange;
 }
 
 .auth-verification-code-input-div {

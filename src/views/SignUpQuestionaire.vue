@@ -166,7 +166,7 @@ export default {
 
     <div class = "main-container">
         <div class = "title-container"> 
-            <h1>Tell Us More About You!</h1>
+            <h3>Tell Us <span class = "title-orange">More</span> About <span class = "title-orange">You!</span></h3>
         </div>
 
         <div class = "profileSection">
@@ -191,11 +191,14 @@ export default {
 
 
         <form @submit.prevent = "submitForm($event)"> 
-            <div class = "input-group">
+           
                 <!-- <div class = "form-group">
 
 
                 </div> -->
+                <div class = "form-heading">
+                    <h4>Profile</h4>
+                </div>
                 <div id = "name">
                     <label for = "name">Name: </label>
                     <input type = "text" id = "name" v-model = "formData.name" required placeholder = "Enter your name">
@@ -217,7 +220,10 @@ export default {
                     <label for = "description"> Describe Yourself: </label>
                     <input type = "text" id = "description" v-model = "formData.description" required placeholder = "Enter details about yourself here">
                 </div>
-
+                
+                <div class = "form-heading">
+                    <h4>Social Media</h4>
+                </div>
                 <div id = "linkedin">
                     <label for = "linkedin">Linkedin Profile Link (optional) </label>
                     <input type = "text" id = "linkedin" v-model = "formData.linkedin" required placeholder = "Enter your LinkedIn profile link here">
@@ -232,7 +238,7 @@ export default {
                     <label for = "telegram">Telegram Profile Link (optional): </label>
                     <input type = "text" id = "telegram" v-model = "formData.telegram" required placeholder = "Enter your Telegram profile link here">
                 </div>
-            </div>
+         
             <button type = "submit" id = "saveButton"> Save </button>
 
 
@@ -249,14 +255,16 @@ export default {
 <style scoped>
 
 .main-container {
-    height: 80%;
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .title-container{
-  width: 100%; 
+  width: 600px; 
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -264,26 +272,50 @@ export default {
   margin-top: 10px;
 }
 
+.title-orange {
+    color:orange;
+}
+
+.profileSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    height:230px;
+    width:100%;
+}
+
+.main-container form {
+    width:600px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
 
 #photo-placeholder {
-    width: 300px;
-    height: 300px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%; /* Keeps the circular shape */
     background-color: #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Ensures no overflow outside the circular boundary */
-    position: relative; /* Position relative to allow absolute positioning inside */
 }
 
 #photo-placeholder img {
-    width: 100%; /* Make image fill the container */
-    height: auto; /* Maintain aspect ratio */
-    position: absolute; /* Position it over your placeholder */
-    top: 50%; /* Align the top edge of the image in the center of the container */
-    left: 50%; /* Align the left edge of the image in the center of the container */
-    transform: translate(-50%, -50%); /* Offset the image back to center properly */
+    height:100%;
+    width:100%;
+    object-fit:contain;
+    /*
+    width: 100%; /* Make image fill the container 
+    height: auto; /* Maintain aspect ratio 
+    top: 50%; /* Align the top edge of the image in the center of the container 
+    left: 50%; /* Align the left edge of the image in the center of the container 
+    transform: translate(-50%, -50%); /* Offset the image back to center properly 
+    */
+    
 }
 
 #addPhotoButton {
@@ -291,14 +323,17 @@ export default {
     color: white; /* White text */
     font-weight: bold; /* Make the text bold */
     border: none; /* No border */
-    border-radius: 20px; /* Rounded corners */
-    padding: 10px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
+    border-radius: 10px; /* Rounded corners */
     text-transform: uppercase; /* Uppercase text */
     cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 2rem; /* Button text size */
-    outline: none; /* Remove focus outline */
-    transition: background-color 0.3s ease;
-    margin-top: 50px;
+    font-size: 20px;
+    margin-top:15px;
+    height:40px;
+    text-align: center;
+}
+
+#addPhotoButton:hover {
+    background-color: orange;
 }
 
 .profileSection {
@@ -310,54 +345,68 @@ export default {
     justify-content: center;
     text-align: center;
     align-content: center;
-    margin-bottom: 50px;
+    margin-bottom:15px;
 }
 
-.input-group {
-    margin-bottom: 1rem; /* Spacing between form groups */
+.form-heading {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width:100%;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.form-heading h4 {
+    font-size:30px;
+    color:orange;
+    text-align:left;
+    font-weight:bold;
+}
+
+
+form label {
+  margin-bottom: 5px;
+  width: 100%;
+  font-size: 17px;
+  text-align: left;
+}
+
+
+form input {
+  width: 100%; 
+  height:40px;
+  border-radius: 5px;
+  border:1px solid black;
+}
+
+
+form div {
     display:flex;
     flex-direction: column;
-    /* align-items: center; */
-    width: 50%; 
-    max-width: 1000px; /* Maximum width of the form */
-    margin: auto;  
-}
-
-.input-group label {
-  margin-bottom: 0.5rem;
-  width: 100%;
-  font-size: 28px;
-  text-align: left;
-  /* display: block; */
-}
-
-
-.input-group input {
-  width: 100%; /* Make input take the full width of its parent */
-  padding: 0.5rem;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  border-radius: 50px;
-  /* align-items: center; */
+    align-items: left;
+    justify-content: center;
+    width:600px;
+    padding-bottom:10px;
 }
 
 #saveButton {
     background-color: #FF6A3D; /* Orange background color */
     color: white; /* White text */
     font-weight: bold; /* Make the text bold */
-    border: none; /* No border */
-    border-radius: 20px; /* Rounded corners */
-    padding: 10px 20px; /* Top/bottom padding of 10px and left/right padding of 20px */
+    border-radius: 5px; /* Rounded corners */
     text-transform: uppercase; /* Uppercase text */
     cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 2rem; /* Button text size */
-    outline: none; /* Remove focus outline */
-    transition: background-color 0.3s ease;
-    margin: auto;
-    display: block;
+    font-size: 20px; /* Button text size */
+    height:40px;
+    width:80px;
+    border:none;
+    margin-bottom:10px;
 }
 
-
+#saveButton:hover {
+    background-color: orange;
+}
 
 </style>
-
