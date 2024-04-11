@@ -7,7 +7,7 @@ import SignUpQuestionaire from '../components/SignUpQuestionaire.vue'
 import Profile from '../components/Profile.vue'
 import EditProfile from '../components/EditProfile.vue';
 import ManagePrj from '../components/ManagePrj.vue'
-import ManagePrj from '../components/ManagePrj.vue'
+
 
 const routes = [
     {
@@ -55,12 +55,6 @@ const routes = [
         component: EditProfile,
         props: true
     },
-    {
-        path:'/ManagePrj/:id',
-        name: 'ManagePrj',
-        component: ManagePrj,
-    
-    }
 ]
 
 const router = createRouter({
