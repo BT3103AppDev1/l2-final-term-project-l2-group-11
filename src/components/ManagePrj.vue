@@ -24,9 +24,9 @@
             <div class="member-item" v-for="member in projectMembers">
                 <div class="member-info">
                     <div class="member-avatar"></div>
-                    <div class="member-name">{{ member }}</div>
+                    <div class="member-name">{{ member.name }}</div>
                 </div>
-                <div class="pos-button"><button class="remove-btn" @click="removeMember(member.id)">Remove</button>
+                <div class="pos-button"><button class="remove-btn" @click="removeMember(member.userID)">Remove</button>
                 </div>
             </div>
         </section>
@@ -35,18 +35,18 @@
             <div class="member-item" v-for="member in pendingMembers">
                 <div class="member-info">
                     <div class="member-avatar"></div>
-                    <div class="member-name">{{ member }}</div>
+                    <div class="member-name">{{ member.name }}</div>
                 </div>
                 <div class="pos-button">
-                    <button class="reject-btn" @click="rejectMember(member.id)">Reject</button>
-                    <button class="remove-btn" @click="removeMember(member.id)">Accept</button>
+                    <button class="reject-btn" @click="rejectMember(member.userID)">Reject</button>
+                    <button class="accept-btn" @click="acceptMember(member.userID)">Accept</button>
                 </div>
             </div>
         </section>
 
         <div class="project-actions">
-            <button class="delete-project-btn">Delete Project</button>
-            <button class="complete-project-btn">Mark Project as Completed</button>
+            <button class="delete-project-btn" @click="deleteProject">Delete Project</button>
+            <button class="complete-project-btn" @click="markCompleted">Mark Project as Completed</button>
         </div>
     </div>
 
@@ -72,8 +72,6 @@ export default {
             projectMembers: [],
             pendingMembers: [],
             isCurrentMembersActive: true,
-            currentID: [],
-            pendingID: [],
         };
     },
 
@@ -90,7 +88,6 @@ export default {
     },
 
     methods: {
-
         async fetchMemberDetails() {
             this.projectID = this.$route.params.id;
             let docRef = doc(db, "Project Collection", this.projectID);
@@ -100,19 +97,19 @@ export default {
             this.currentID = projectData.projectMembers;
             this.pendingID = projectData.pendingMembers;
 
-            this.currentID.forEach(async (member) => {
-                let userDocRef = doc(db, "User Information", member);
+            for (const memberID of this.currentID) {
+                let userDocRef = doc(db, "User Information", memberID);
                 let userDocSnap = await getDoc(userDocRef);
                 let userData = userDocSnap.data();
-                this.projectMembers.push(userData.name);
-            });
+                this.projectMembers.push({ name: userData.name, userID: memberID });
+            }
 
-            this.pendingID.forEach(async (member) => {
-                let userDocRef = doc(db, "User Information", member);
+            for (const memberID of this.pendingID) {
+                let userDocRef = doc(db, "User Information", memberID);
                 let userDocSnap = await getDoc(userDocRef);
                 let userData = userDocSnap.data();
-                this.pendingMembers.push(userData.name);
-            });
+                this.pendingMembers.push({ name: userData.name, userID: memberID });
+            }
 
         },
 
@@ -123,13 +120,90 @@ export default {
             this.isCurrentMembersActive = false;
         },
 
-        // async removeMember(memberId) {
-        //     const projectRef = doc(db, "Project Collection", this.projectID);
-        //     await updateDoc(projectRef, {
-        //         projectMembers: arrayRemove({ id: memberId })
-        //     });
-        //     this.projectMembers = this.projectMembers.filter(member => member.id !== memberId);
-        // },
+        async removeMember(memberId) {
+            const projectRef = doc(db, "Project Collection", this.projectID);
+            await updateDoc(projectRef, {
+                projectMembers: arrayRemove({ id: memberId })
+            });
+            this.projectMembers = this.projectMembers.filter(member => member.id !== memberId);
+
+            const userRef = doc(db, "User Information", memberId);
+            await updateDoc(userRef, {
+                currentProjects: arrayRemove({ id: this.projectID })
+            });
+            alert("Remove Member");
+
+            // reload the page
+            window.location.reload();
+        },
+
+        async rejectMember(memberId) {
+            const projectRef = doc(db, "Project Collection", this.projectID);
+            await updateDoc(projectRef, {
+                pendingMembers: arrayRemove({ id: memberId })
+            });
+            this.pendingMembers = this.pendingMembers.filter(member => member.id !== memberId);
+            alert("Reject Member");
+
+            // reload the page
+            window.location.reload();
+        },
+
+        async acceptMember(memberId) {
+            const projectRef = doc(db, "Project Collection", this.projectID);
+            await updateDoc(projectRef, {
+                pendingMembers: arrayRemove({ id: memberId }),
+                projectMembers: arrayUnion({ id: memberId })
+            });
+            this.pendingMembers = this.pendingMembers.filter(member => member.id !== memberId);
+
+            const userRef = doc(db, "User Information", memberId);
+            const userDocSnap = await getDoc(userRef);
+            if (userDocSnap.exists()) {
+                await updateDoc(userRef, {
+                    currentProjects: arrayUnion({ id: this.projectID })
+                });
+            } else {
+                await setDoc(userRef, {
+                    currentProjects: [{ id: this.projectID }]
+                });
+            }
+
+            alert("Accept Member");
+
+            // reload the page
+            window.location.reload();
+        },
+
+        async deleteProject() {
+            await deleteDoc(doc(db, "Project Collection", this.projectID));
+            alert("Project Deleted");
+
+            // redirect to Project Page. push...
+        },
+
+        async markCompleted() {
+            const projectRef = doc(db, "Project Collection", this.projectID);
+            await updateDoc(projectRef, {
+                projectCompleted: true
+            });
+
+            const userRef = doc(db, "User Information", uid);
+            const userDocSnap = await getDoc(userRef);
+            if (userDocSnap.exists()) {
+                await updateDoc(userRef, {
+                    pastProjects: arrayUnion({ id: this.projectID })
+                });
+            } else {
+                await setDoc(userRef, {
+                    pastProjects: [{ id: this.projectID }]
+                });
+            }
+
+            alert("Project Completed");
+
+            // redirect to Project Page. push...
+        },
     },
 
 }
@@ -236,14 +310,17 @@ img {
     margin-right: 20px;
 }
 
-.remove-btn {
+.remove-bt,
+.accept-btn,
+.complete-project-btn {
     background-color: #f5793b;
     color: #fff;
 
 }
 
 .remove-btn,
-.reject-btn {
+.reject-btn,
+.accept-btn {
     border: none;
     padding: 16px 32px;
     font: 600 18px/1 Inter, sans-serif;
@@ -256,10 +333,10 @@ img {
 }
 
 .project-actions {
-  display: flex;
-  gap: 20px;
-  margin-top: 46px;
-  padding-left: 7%;
+    display: flex;
+    gap: 20px;
+    margin-top: 46px;
+    padding-left: 7%;
 }
 
 .delete-project-btn,
@@ -268,8 +345,7 @@ img {
     padding: 16px 32px;
     font: 600 18px/1 Inter, sans-serif;
     cursor: pointer;
-    
+
 
 }
-
 </style>
