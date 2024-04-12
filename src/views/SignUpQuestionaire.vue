@@ -192,10 +192,6 @@ export default {
 
         <form @submit.prevent = "submitForm($event)"> 
            
-                <!-- <div class = "form-group">
-
-
-                </div> -->
                 <div class = "form-heading">
                     <h4>Profile</h4>
                 </div>
@@ -226,17 +222,17 @@ export default {
                 </div>
                 <div id = "linkedin">
                     <label for = "linkedin">Linkedin Profile Link (optional) </label>
-                    <input type = "text" id = "linkedin" v-model = "formData.linkedin" required placeholder = "Enter your LinkedIn profile link here">
+                    <input type = "text" id = "linkedin" v-model = "formData.linkedin" placeholder = "Enter your LinkedIn profile link here">
                 </div>
 
                 <div id = "instagram">
                     <label for = "instagram">Instagram Profile Link (optional) </label>
-                    <input type = "text" id = "instagram" v-model = "formData.instagram" required placeholder = "Enter your Instagram profile link here">
+                    <input type = "text" id = "instagram" v-model = "formData.instagram" placeholder = "Enter your Instagram profile link here">
                 </div>
 
                 <div id = "telegram">
                     <label for = "telegram">Telegram Profile Link (optional): </label>
-                    <input type = "text" id = "telegram" v-model = "formData.telegram" required placeholder = "Enter your Telegram profile link here">
+                    <input type = "text" id = "telegram" v-model = "formData.telegram" placeholder = "Enter your Telegram profile link here">
                 </div>
          
             <button type = "submit" id = "saveButton"> Save </button>
@@ -264,7 +260,6 @@ export default {
 }
 
 .title-container{
-  width: 600px; 
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -308,6 +303,7 @@ export default {
     height:100%;
     width:100%;
     object-fit:contain;
+    border-radius: 50%;
     /*
     width: 100%; /* Make image fill the container 
     height: auto; /* Maintain aspect ratio 
@@ -388,7 +384,6 @@ form div {
     align-items: left;
     justify-content: center;
     width:600px;
-    padding-bottom:10px;
 }
 
 #saveButton {
@@ -398,11 +393,12 @@ form div {
     border-radius: 5px; /* Rounded corners */
     text-transform: uppercase; /* Uppercase text */
     cursor: pointer; /* Change mouse pointer to indicate button */
-    font-size: 20px; /* Button text size */
+    font-size: 15px; /* Button text size */
     height:40px;
     width:80px;
     border:none;
-    margin-bottom:10px;
+    margin-bottom:20px;
+    margin-top:20px;
 }
 
 #saveButton:hover {
