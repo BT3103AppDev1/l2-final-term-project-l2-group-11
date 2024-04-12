@@ -59,6 +59,7 @@ import 'firebase/compat/auth';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { collection, getDoc, doc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import router from '@/router';
 
 const db = getFirestore(firebaseApp);
 
@@ -122,64 +123,66 @@ export default {
 
         async removeMember(memberId) {
             const projectRef = doc(db, "Project Collection", this.projectID);
-            await updateDoc(projectRef, {
-                projectMembers: arrayRemove({ id: memberId })
-            });
-            this.projectMembers = this.projectMembers.filter(member => member.id !== memberId);
+            const userRef = doc(db, "User Information", memberId); // cannot update the user's currentProjects field, after remove 
 
-            const userRef = doc(db, "User Information", memberId);
-            await updateDoc(userRef, {
-                currentProjects: arrayRemove({ id: this.projectID })
-            });
-            alert("Remove Member");
+            this.projectMembers = this.pendingMembers.filter(member => member.userID !== memberId);
+
+            await Promise.all([
+                updateDoc(projectRef, {
+                    projectMembers: arrayRemove(memberId)
+                }),
+                updateDoc(userRef, {
+                    currentProjects: arrayRemove(this.projectID)
+                })
+            ]);
+            
+
+            alert("Member Removed");
 
             // reload the page
             window.location.reload();
+
+            // Update UI without page reload
         },
 
         async rejectMember(memberId) {
             const projectRef = doc(db, "Project Collection", this.projectID);
-            await updateDoc(projectRef, {
-                pendingMembers: arrayRemove({ id: memberId })
-            });
-            this.pendingMembers = this.pendingMembers.filter(member => member.id !== memberId);
-            alert("Reject Member");
 
-            // reload the page
+            await updateDoc(projectRef, {
+                pendingMembers: arrayRemove(memberId)
+            });
+
+            this.pendingMembers = this.pendingMembers.filter(member => member.userID !== memberId);
+            alert("Member Rejected");
+
             window.location.reload();
         },
 
         async acceptMember(memberId) {
             const projectRef = doc(db, "Project Collection", this.projectID);
-            await updateDoc(projectRef, {
-                pendingMembers: arrayRemove({ id: memberId }),
-                projectMembers: arrayUnion({ id: memberId })
-            });
-            this.pendingMembers = this.pendingMembers.filter(member => member.id !== memberId);
-
             const userRef = doc(db, "User Information", memberId);
-            const userDocSnap = await getDoc(userRef);
-            if (userDocSnap.exists()) {
-                await updateDoc(userRef, {
-                    currentProjects: arrayUnion({ id: this.projectID })
-                });
-            } else {
-                await setDoc(userRef, {
-                    currentProjects: [{ id: this.projectID }]
-                });
-            }
 
-            alert("Accept Member");
+            await Promise.all([
+                updateDoc(projectRef, {
+                    pendingMembers: arrayRemove(memberId),
+                    projectMembers: arrayUnion(memberId)
+                }),
+                updateDoc(userRef, {
+                    currentProjects: arrayUnion(this.projectID)
+                })
+            ]);
 
-            // reload the page
+            this.pendingMembers = this.pendingMembers.filter(member => member.userID !== memberId);
+            alert("Member Accepted");
+            
             window.location.reload();
+            // Update UI without page reload
         },
 
         async deleteProject() {
             await deleteDoc(doc(db, "Project Collection", this.projectID));
             alert("Project Deleted");
-
-            // redirect to Project Page. push...
+            router.push('/project');
         },
 
         async markCompleted() {
@@ -202,7 +205,7 @@ export default {
 
             alert("Project Completed");
 
-            // redirect to Project Page. push...
+            router.push('/project');
         },
     },
 
@@ -310,7 +313,7 @@ img {
     margin-right: 20px;
 }
 
-.remove-bt,
+.remove-btn,
 .accept-btn,
 .complete-project-btn {
     background-color: #f5793b;
