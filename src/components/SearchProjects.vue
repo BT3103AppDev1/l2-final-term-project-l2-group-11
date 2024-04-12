@@ -80,7 +80,7 @@ export default {
         <div id="search-bar">
           <input type="text" v-model="searchInput" placeholder="Search" id="rounded-search" @keyup.enter="submitSearch"/>
           <button @click="searchProjects" id="searchProjectButton">Search</button>
-          <button @click="$router.push('/Cppp')" id="createProjectButton" id="createProjectButton">Create your project</button>
+          <button @click="$router.push('/Cppp')" id="createProjectButton">Create your project</button>
         </div>
       </div>
 
