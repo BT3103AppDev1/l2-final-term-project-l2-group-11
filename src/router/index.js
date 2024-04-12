@@ -8,6 +8,7 @@ import Profile from "../components/Profile.vue";
 import EditProfile from "../components/EditProfile.vue";
 import ManagePrj from "../components/ManagePrj.vue";
 import Cppp from "../components/Cppp.vue";
+import EditProjectProfile from "../components/EditProjectProfile.vue";
 
 const routes = [
   {
@@ -58,6 +59,11 @@ const routes = [
     path: "/Cppp",
     name: "Cppp",
     component: Cppp,
+  },
+  {
+    path: "/editProjectProfile/:id",
+    name: "EditProjectProfile",
+    component: EditProjectProfile,
   },
 ];
 

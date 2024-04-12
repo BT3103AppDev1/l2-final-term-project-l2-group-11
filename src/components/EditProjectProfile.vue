@@ -4,7 +4,7 @@
         <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
         <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
         <br>
-        <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
+        <button id="addBackground" @click="triggerFileUploadForBackground">Change Background</button>
         <!-- Hidden file input -->
         <input type="file" id="backgroundUpload" ref="backgroundUpload" @change="handleBackgroundUpload($event)"
             style="display: none;">
@@ -20,7 +20,7 @@
 
                 <div class="addThumbnailButton">
                     <br> <br>
-                    <button id="addThumbnail" @click="triggerFileUpload">Add Thumbnail</button>
+                    <button id="addThumbnail" @click="triggerFileUpload">Change Thumbnail</button>
                 </div> <br>
                 <!-- Hidden file input -->
                 <input type="file" id="photoUpload" ref="photoUpload" @change="handleFileUpload($event)"
@@ -78,17 +78,15 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, setDoc } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
 export default {
-    name: 'Cppp',
+    name: 'EditProjectProfile',
 
     data() {
         return {
-            pageBackgroundColor: '#FDF8F6',
             projectName: "",
             projectDescription: "",
             skillsRequired: "",
@@ -98,36 +96,52 @@ export default {
             projectHost: "",
             projectMembers: [],
             projectID: "",
+            projectImage: null,
+            projectThumbnailUrl: null,
+            projectBackground: "",
             projectStart: "",
             projectEnd: "",
-            projectImage: null,
-            projectImagePreview: null,
-            projectBackground: null,
-            projectBackgroundPreview: null,
+            pendingMembers: []
         }
     },
 
     methods: {
-        setBodyBackGroundColor(color) {
-            //apply background color to the body of the webpage
-            document.body.style.backgroundColor = color;
+        async fetchProjectDetails() {
+            this.projectID = this.$route.params.id;
+            let docRef = doc(db, "Project Collection", this.projectID);
+            let docSnap = await getDoc(docRef);
+            let projectData = docSnap.data()
+            this.projectName = projectData.projectName;
+            this.projectDescription = projectData.projectDescription;
+            this.projectHost = projectData.projectHost;
+            this.projectMembers = projectData.projectMembers;
+            this.membersRequired = projectData.membersRequired;
+            this.signupDeadline = projectData.signupDeadline.toDate().toDateString();
+            this.skillsRequired = projectData.skillsRequired;
+            this.projectStart = projectData.projectStart.toDate().toDateString();
+            this.projectEnd = projectData.projectEnd.toDate().toDateString();
+            this.pendingMembers = projectData.pendingMembers;
+            this.findOutMore = projectData.Find_Out_More;
+            this.projectImage = projectData.projectImage;
+            this.projectBackground = projectData.projectBackground;
         },
 
-        async launchProject() {
+        async saveChanges() {
             console.log("IN LP")
-            alert(" Launching your project : " + projectName)
+            alert(" Saving changes to your project : " + projectName)
 
             try {
-                const docRef = await setDoc(doc(db, "Project Collection", String(this.projectName)), {
+                const docRef = await updateDoc(doc(db, "Project Collection", this.projectID), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
                     Find_Out_More: this.findOutMore, membersRequired: this.membersRequired, projectStart: this.projectStart,
                     projectEnd: this.projectEnd, signupDeadline: this.signupDeadline, projectID: this.projectID, projectHost: this.projectHost,
                     projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground,
+                    projectImage: this.projectImage, projectThumbnailUrl: this.projectThumbnailUrl
                 });
                 console.log(docRef)
             }
             catch (error) {
-                console.error("Error adding document: ", error);
+                console.error("Error saving document: ", error);
             }
         },
 
@@ -149,13 +163,23 @@ export default {
         async previewImage(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.projectImagePreview = e.target.result;
+                this.projectImage = e.target.result;
             };
 
             reader.onloadend = async () => {
-                const downloadURL = await this.uploadImage(file);
-                if (downloadURL) {
-                    this.projectImage = downloadURL;
+                // This should be called when the reader has finished reading the file
+                try {
+                    const downloadURL = await this.uploadImage(file);
+                    if (downloadURL) {
+                        this.projectThumbnailUrl = downloadURL;
+                        const docRef = doc(db, 'Project Collection', this.projectID);
+                        await setDoc(docRef, {
+                            projectImage: downloadURL, // Save the image URL in Firestore
+                        }, { merge: true });
+                        console.log("Firestore document updated with image URL");
+                    }
+                } catch (error) {
+                    console.error("Error updating Firestore document or uploading image: ", error);
                 }
             };
             reader.readAsDataURL(file); // Start reading the file
@@ -178,7 +202,6 @@ export default {
                 throw error;
             }
         },
-
 
         triggerFileUploadForBackground() {
             // Trigger the hidden file input when the button is clicked
@@ -229,14 +252,7 @@ export default {
     },
 
     mounted() {
-        this.setBodyBackGroundColor(this.pageBackgroundColor);
-
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                this.projectHost = user.uid;
-            }
-        });
+        this.fetchProjectDetails();
     }
 }
 </script>
