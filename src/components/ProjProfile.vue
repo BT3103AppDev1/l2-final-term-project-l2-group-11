@@ -6,9 +6,10 @@
             <div class="title">
                 <h1 id="projTitle">{{ projectName }}</h1><br>
                 <div v-if="this.uid == this.projectHost" class="buttonsForHost">
-                    <button id="button1">
+                    <button id="button1"
+                        @click="$router.push({ name: 'EditProjectProfile', params: { id: this.projectID } })">
                         Edit Project Detail</button>
-                    <button id="button2" @click = "manageProject">Manage Project</button>
+                    <button id="button2" @click="manageProject">Manage Project</button>
                 </div>
                 <div v-else-if="this.projectMembers.includes(this.uid) || this.pendingMembers.includes(this.uid)"
                     class="buttonsForMember">
@@ -53,7 +54,7 @@
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
 import { getDoc, doc, updateDoc } from "firebase/firestore";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
 const db = getFirestore(firebaseApp);
@@ -79,8 +80,6 @@ export default {
     },
 
     methods: {
-    // this.$router.push({ name: 'ProjProfile', params: { id: this.project.id } });
-
         async fetchProjectDetails() {
             this.projectID = this.$route.params.id;
             let docRef = doc(db, "Project Collection", this.projectID);
