@@ -1,13 +1,24 @@
 <template>
     <div class="heading">
-        <img src="../assets/CpppImage.png" alt="error" class="center-image"><br><br>
+        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
 
         <div class="titleDetail">
             <div class="title">
                 <h1 id="projTitle">{{ projectName }}</h1><br>
-                <div class="buttons">
-                    <button id="button1">Edit project detail</button>
-                    <button id="button2">Manage project</button>
+                <div v-if="this.uid == this.projectHost" class="buttonsForHost">
+                    <button id="button1"
+                        @click="$router.push({ name: 'EditProjectProfile', params: { id: this.projectID } })">
+                        Edit Project Detail</button>
+                    <button id="button2" @click="manageProject">Manage Project</button>
+                </div>
+                <div v-else-if="this.projectMembers.includes(this.uid) || this.pendingMembers.includes(this.uid)"
+                    class="buttonsForMember">
+                    <button id="button1" @click="leaveProject">Leave Project</button>
+                </div>
+                <div v-else class="buttonsForOther">
+                    <button id="button1" @click="applyForProject">Appply For Project</button>
+                    <button id="button2">Save Project</button>
                 </div>
             </div>
 
@@ -43,7 +54,8 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
 const db = getFirestore(firebaseApp);
@@ -62,11 +74,14 @@ export default {
             signupDeadline: "",
             skillsRequired: [],
             projectStart: "",
-            projectEnd: ""
+            projectEnd: "",
+            uid: "",
+            pendingMembers: [],
+            projectBackground: null,
         }
     },
 
-    methods:{
+    methods: {
         async fetchProjectDetails() {
             this.projectID = this.$route.params.id;
             let docRef = doc(db, "Project Collection", this.projectID);
@@ -80,12 +95,68 @@ export default {
             this.signupDeadline = projectData.signupDeadline.toDate().toDateString();
             this.skillsRequired = projectData.skillsRequired;
             this.projectStart = projectData.projectStart.toDate().toDateString();
-            this.projectEnd = projectData.projectEnd.toDate().toDateString();  
+            this.projectEnd = projectData.projectEnd.toDate().toDateString();
+            this.pendingMembers = projectData.pendingMembers;
+            this.projectBackground = projectData.projectBackground;
+        },
+
+        manageProject() {
+            const id = this.projectID
+
+            this.$router.push({ path: `/ManagePrj/${id}` })
+            //this.$router.push({name: "/ManagePrj", params: {id: this.projectID}});
+        },
+
+        async applyForProject() {
+            // Add the user to the pending members list
+            this.pendingMembers.push(this.uid);
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                pendingMembers: this.pendingMembers
+            });
+            alert("Applied for project");
+
+            // reload the page
+            window.location.reload();
+        },
+
+        async leaveProject() {
+            if (this.projectMembers.includes(this.uid)) {
+                // Remove the user from the project members list
+                this.projectMembers = this.projectMembers.filter(member => member !== this.uid);
+                // Update the project document
+                const docRef = doc(db, "Project Collection", this.projectID)
+                await updateDoc(docRef, {
+                    projectMembers: this.projectMembers,
+                });
+                alert("Left project");
+            }
+
+            else if (this.pendingMembers.includes(this.uid)) {
+                // Remove the user from the pending members list
+                this.pendingMembers = this.pendingMembers.filter(member => member !== this.uid);
+                // Update the project document
+                const docRef = doc(db, "Project Collection", this.projectID)
+                await updateDoc(docRef, {
+                    pendingMembers: this.pendingMembers,
+                });
+                alert("Left project");
+            }
+            // reload the page
+            window.location.reload();
         }
     },
 
     mounted() {
-        this.fetchProjectDetails()
+        this.fetchProjectDetails();
+
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.uid = user.uid;
+            }
+        });
     }
 }
 </script>
@@ -126,7 +197,9 @@ img {
     background-color: #f5793b;
 }
 
-.buttons {
+.buttonsForHost,
+.buttonsForMember,
+.buttonsForOther {
     display: flex;
     gap: 100px;
     padding-left: 100px;
@@ -136,7 +209,7 @@ button {
     background-color: black;
     border: none;
     color: white;
-    padding: 15px;
+    padding: 13px;
     width: 175px;
     text-align: center;
     text-decoration: none;

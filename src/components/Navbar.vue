@@ -3,7 +3,7 @@
         <router-link to = "/" class = "nav-logo-link">
             <div class = "nav-logo">
                 <img class = "nav-kaizen-logo" src = "../assets/kaizenlogo.jpeg"/>
-                <img class = "nav-kaizen" src = "../assets/kaizen.jpeg"/>
+                <img class = "nav-kaizen" src = "../assets/Kaizen.jpeg"/>
             </div>
         </router-link>
         <div class = "link-button-container">
@@ -104,7 +104,7 @@
 
   .nav-logo {
     height:100%;
-    width:100%;
+    width:80%;
     display:flex;
     flex-direction:row;
     align-items:center;
@@ -139,11 +139,11 @@
     align-items:center;
     height:100%;
     color:#F5793B;
-    padding-left:100px;
+    /* padding-left:10px; */
   }
   .link .router-link {
     color: #F5793B;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: 600;
     background-color:white;
   }

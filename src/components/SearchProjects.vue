@@ -80,7 +80,7 @@ export default {
         <div id="search-bar">
           <input type="text" v-model="searchInput" placeholder="Search" id="rounded-search" @keyup.enter="submitSearch"/>
           <button @click="searchProjects" id="searchProjectButton">Search</button>
-          <button @click="createProject" id="createProjectButton">Create your project</button>
+          <button @click="$router.push('/Cppp')" id="createProjectButton">Create your project</button>
         </div>
       </div>
 
@@ -106,21 +106,26 @@ export default {
 
       <div v-else-if="filteredProjects.length == 0" class="projects-container">
         <div class="projectCategory">
-          <p>{{ searchInput }}</p>
-        </div>
-        <div class="no-results">
-          No results found
+          <div class="project-category-title">
+            <h4>{{ searchInput }}</h4>
+          </div>
+          <div class="no-results">
+            No results found
+          </div>
         </div>
       </div>
 
       <div v-else class="projects-container">
         <div class="projectCategory">
-          <p>{{ searchInput }}</p>
-        </div>
-        <div class="projects-cart">
-          <Card v-for="project in filteredProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+          <div class="project-category-title">
+            <h4>{{ searchInput }}</h4>
+          </div>
+          <div class="projects-cart">
+            <Card v-for="project in filteredProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+          </div>
         </div>
       </div>
+      
     </div>
 </template>
 
