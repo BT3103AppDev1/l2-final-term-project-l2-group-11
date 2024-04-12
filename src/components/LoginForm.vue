@@ -2,11 +2,11 @@
     <form id = "authForm">
         <div class = "label-input-div">
             <label for = "auth-email-input">Email Address</label>
-            <input type = "text" v-model = "EmailAddress" id = "auth-email-input" placeholder = " Email address">
+            <input type = "text" autocomplete = "off" v-model = "EmailAddress" id = "auth-email-input" placeholder = " Email address">
         </div>
         <div class = "label-input-div">
             <label for = "auth-password-input">Password</label>
-            <input type = "text" v-model = "Password" id = "auth-password-input" placeholder = " Password">
+            <input v-model = "Password" id = "auth-password-input" placeholder = " Password" type = "password" autocomplete = "off">
         </div>
         <button  type = "button" :disabled = "EmailAddress == '' && Password == ''" v-on:click.prevent = "login">Login</button>
     </form>

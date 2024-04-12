@@ -10,7 +10,6 @@
             <div class = "link">
                 <router-link to = "/" class = "router-link" > About </router-link> 
                 <router-link to = "/project" class = "router-link" > Project </router-link> 
-                <router-link to = "/reviews" class = "router-link" > Review </router-link> 
             </div>
             <div v-if = "!isLoggedIn" class = "login-register-buttons">
                <router-link to = "/auth/login" class = "router-link">Login</router-link>
@@ -150,12 +149,12 @@
 
   .link .router-link-active {
     text-decoration: underline;
-    font-size:25px;
+    font-size:30px;
   }
 
   .link .router-link:hover {
     background-color:white;
-    font-size:25px;
+    font-size:30px;
   }
 
   .login-register-buttons {
