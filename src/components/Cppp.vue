@@ -1,69 +1,86 @@
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
-    <div>
-        <img src="../assets/CpppImage.png" alt="error" class="center-image">
+    <div class="background">
+        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
+        <br>
+        <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
+        <!-- Hidden file input -->
+        <input type="file" id="backgroundUpload" ref="backgroundUpload" @change="handleBackgroundUpload($event)"
+            style="display: none;">
     </div> <br> <br>
 
-    <div class="container1">
-        <div class="left">
-            <button id="addBackground">Add Background</button> <br><br><br>
-            <img src="../assets/CpppThumbnail.png" alt="error"> <br><br><br>
-            <button id="addThumbnail">Add Thumbnail</button>
-        </div>
+    <div class="container">
+        <div class="left-side">
+            <div class="thumbnail">
+                <div class="thumbnailImage">
+                    <img id="thumbnail" v-if="projectImage" :src="projectImage" alt="not found">
+                    <img id="thumbnail" v-else src="../assets/CpppThumbnail.png" alt="not found">
+                </div> <br>
 
-        <div class="right">
-            <div class="projectTitle">
-                <h3>Project Title</h3>
-                <textarea id="projectTitle" required v-model="projectTitle"></textarea>
+                <div class="addThumbnailButton">
+                    <br> <br>
+                    <button id="addThumbnail" @click="triggerFileUpload">Add Thumbnail</button>
+                </div> <br>
+                <!-- Hidden file input -->
+                <input type="file" id="photoUpload" ref="photoUpload" @change="handleFileUpload($event)"
+                    style="display: none;">
             </div> <br>
-
             <div class="description">
                 <h3>Description</h3>
                 <textarea id="description" required v-model="projectDescription"></textarea>
+            </div> <br>
+        </div>
+
+        <div class="right-side">
+            <div class="projectName">
+                <h3>Project Name</h3>
+                <textarea id="projectName" required v-model="projectName"></textarea>
             </div> <br>
 
             <div class="skill">
                 <h3>Skills</h3>
                 <textarea id="skill" required v-model="skillsRequired"></textarea>
-            </div>
-        </div>
-    </div>
+            </div> <br>
 
-    <div class="container2">
-        <div class="left2">
-            <div class="noOfMember">
+            <div class="membersRequired">
                 <h3>Number of Members</h3>
-                <textarea id="noOfMember" required v-model="noOfMember"></textarea>
+                <textarea id="membersRequired" required v-model="membersRequired"></textarea>
             </div> <br>
 
-            <div class="projTimeline">
-                <h3>Project Timeline</h3>
-                <textarea id="projTimeline" required v-model="projectTimeline"></textarea>
-            </div> <br>
-        </div>
-        <div class="right2">
             <div class="signUpDeadline">
                 <h3>Sign Up Deadline</h3>
                 <textarea id="signUpDeadline" required v-model="signupDeadline"></textarea>
             </div> <br>
 
+            <div class="projectStart">
+                <h3>Project Start Date</h3>
+                <textarea id="projectStart" required v-model="projectStart"></textarea>
+            </div> <br>
+
+            <div class="projectEnd">
+                <h3>Project End Date</h3>
+                <textarea id="projectEnd" required v-model="projectEnd"></textarea>
+            </div> <br>
+
             <div class="findOutMore">
-                <h3>Find Out More</h3>
+                <h3>Link</h3>
                 <textarea id="findOutMore" required v-model="findOutMore"></textarea>
             </div>
         </div>
     </div> <br>
+
     <div class="launchProj">
-        <button @click="launchProject">Launch Project</button>
+        <button @click="launchProject(), $router.push('Project')">Launch Project</button>
     </div>
-
-
 </template>
 
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -71,33 +88,155 @@ export default {
 
     data() {
         return {
-            projectTitle: "",
+            pageBackgroundColor: '#FDF8F6',
+            projectName: "",
             projectDescription: "",
             skillsRequired: "",
-            noOfMember: "",
-            projectTimeline: "",
+            membersRequired: "",
             signupDeadline: "",
             findOutMore: "",
             projectHost: "",
+            projectMembers: [],
+            projectID: "",
+            projectStart: "",
+            projectEnd: "",
+            projectImage: null,
+            projectImagePreview: null,
+            projectBackground: null,
+            projectBackgroundPreview: null,
         }
     },
 
     methods: {
+        setBodyBackGroundColor(color) {
+            //apply background color to the body of the webpage
+            document.body.style.backgroundColor = color;
+        },
+
         async launchProject() {
             console.log("IN LP")
-            alert(" Launching your project : " + projectTitle)
+            alert(" Launching your project : " + projectName)
 
             try {
-                const docRef = await setDoc(doc(db, "Project Collection", String(this.projectTitle)), {
-                    Project_Title: this.projectTitle, Description: this.projectDescription, Skills_Required: this.skillsRequired,
-                    Find_Out_More: this.findOutMore, Number_of_Members: this.noOfMember, Project_Timeline: this.projectTimeline, Sign_Up_Deadline: this.signupDeadline,
+                const docRef = await setDoc(doc(db, "Project Collection", String(this.projectName)), {
+                    projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
+                    Find_Out_More: this.findOutMore, membersRequired: this.membersRequired, projectStart: this.projectStart,
+                    projectEnd: this.projectEnd, signupDeadline: this.signupDeadline, projectID: this.projectID, projectHost: this.projectHost,
+                    projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground,
                 });
                 console.log(docRef)
             }
             catch (error) {
                 console.error("Error adding document: ", error);
             }
-        }
+        },
+
+        triggerFileUpload() {
+            // Trigger the hidden file input when the button is clicked
+            this.$refs.photoUpload.click();
+        },
+
+        // Handle the file being selected
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Proceed to read and upload the file
+                this.previewImage(file);
+            }
+        },
+
+        // Function to read the file and display a preview
+        async previewImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.projectImagePreview = e.target.result;
+            };
+
+            reader.onloadend = async () => {
+                const downloadURL = await this.uploadImage(file);
+                if (downloadURL) {
+                    this.projectImage = downloadURL;
+                }
+            };
+            reader.readAsDataURL(file); // Start reading the file
+        },
+
+        //handles the upload of the image to Firebase Storage.
+        async uploadImage(file) {
+            const storage = getStorage(firebaseApp);
+            const imageRef = storageRef(storage, 'projectImages/' + this.projectID + '/' + file.name);
+
+            try {
+                // Upload the file to Firebase Storage
+                const snapshot = await uploadBytes(imageRef, file);
+
+                // Return the download URL
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                return downloadURL;
+            } catch (error) {
+                console.error("Failed to upload image: ", error);
+                throw error;
+            }
+        },
+
+
+        triggerFileUploadForBackground() {
+            // Trigger the hidden file input when the button is clicked
+            this.$refs.backgroundUpload.click();
+        },
+
+        handleBackgroundUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Proceed to read and upload the file
+                this.previewBackground(file);
+            }
+        },
+
+        // Function to read the file and display a preview
+        async previewBackground(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.projectBackgroundPreview = e.target.result;
+            };
+
+            reader.onloadend = async () => {
+                const downloadURL = await this.uploadBackground(file);
+                if (downloadURL) {
+                    this.projectBackground = downloadURL;
+                }
+            };
+            reader.readAsDataURL(file); // Start reading the file
+        },
+
+        //handles the upload of the image to Firebase Storage.
+        async uploadBackground(file) {
+            const storage = getStorage(firebaseApp);
+            const imageRef = storageRef(storage, 'projectBackground/' + this.projectID + '/' + file.name);
+
+            try {
+                // Upload the file to Firebase Storage
+                const snapshot = await uploadBytes(imageRef, file);
+
+                // Return the download URL
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                return downloadURL;
+            } catch (error) {
+                console.error("Failed to upload image: ", error);
+                throw error;
+            }
+        },
+    },
+
+    mounted() {
+        this.setBodyBackGroundColor(this.pageBackgroundColor);
+
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.projectHost = user.uid;
+            }
+        });
     }
 }
 </script>
@@ -106,41 +245,41 @@ export default {
 h1 {
     text-align: center;
     font-size: 45px;
+    color: #f5793b;
 }
 
-.container1 {
+h3 {
+    font-size: 20px;
+    color: #f5793b;
+}
+
+.background {
+    text-align: center;
+}
+
+.thumbnail {
     display: flex;
+    gap: 30px;
 }
 
-.container2 {
-    margin-left: 9%;
+.thumbnailImage {
+    width: 50%;
+    text-align: right;
+}
+
+.container {
     display: flex;
-    flex-direction: row;
-    gap: 5px;
+    margin-left: 10%;
+    margin-right: 5%;
+    gap: 5%;
 }
 
-.left {
-    margin-left: 9%;
-    flex-direction: column;
-    width: 40%;
+.right-side {
+    width: 50%;
 }
 
-.right {
-    flex-direction: column;
-}
-
-.left2 {
-    width: 44%;
-}
-
-.right2 {
-    width: 47%;
-}
-
-.center-image {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+#description {
+    height: 400px;
 }
 
 button {
@@ -171,38 +310,19 @@ button:active {
 }
 
 textarea {
+    height: 50px;
     resize: none;
     outline: none;
+    width: 90%;
     font-size: 18px;
-    padding: 20px;
+    padding: 15px;
     border-radius: 3px;
     border: none;
     background-color: rgb(212, 211, 211);
 }
 
-#projectTitle,
-#description,
-#skill {
-    width: 460px;
-}
-
-#noOfMember,
-#projTimeline,
-#signUpDeadline,
-#findOutMore {
-    width: 460px;
-}
-
-h1 {
-    color: #f5793b;
-}
-
-h3 {
-    font-size: 20px;
-    color: #f5793b;
-}
-
 .launchProj {
-    margin-left: 9%;
+    display: flex;
+    justify-content: center;
 }
 </style>
