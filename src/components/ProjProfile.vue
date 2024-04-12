@@ -1,6 +1,7 @@
 <template>
     <div class="heading">
-        <img src="../assets/CpppImage.png" alt="error" class="center-image"><br><br>
+        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
 
         <div class="titleDetail">
             <div class="title">
@@ -76,6 +77,7 @@ export default {
             projectEnd: "",
             uid: "",
             pendingMembers: [],
+            projectBackground: null,
         }
     },
 
@@ -95,6 +97,7 @@ export default {
             this.projectStart = projectData.projectStart.toDate().toDateString();
             this.projectEnd = projectData.projectEnd.toDate().toDateString();
             this.pendingMembers = projectData.pendingMembers;
+            this.projectBackground = projectData.projectBackground;
         },
 
         manageProject() {
