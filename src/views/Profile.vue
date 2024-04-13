@@ -27,7 +27,8 @@ export default {
             hostedProjects: [],
             currentProjects: [],
             pastProjects: [],
-            savedProjects: [],  
+            savedProjects: [],
+            pendingProjects: []  
         };
     },
 
@@ -43,6 +44,7 @@ export default {
                 this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects);
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
+                this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
             } else {
                 this.userstate = false;
             }
@@ -241,28 +243,24 @@ export default {
             <span :class="{active: activeTab === 'current-projects'}" @click="setActiveTab('current-projects')">Current Projects</span>
             <span :class="{active: activeTab === 'past-projects'}" @click="setActiveTab('past-projects')">Past Projects</span>
             <span :class="{active: activeTab === 'saved-projects'}" @click="setActiveTab('saved-projects')">Saved Projects</span>
+            <span :class="{active: activeTab === 'pending-projects'}" @click="setActiveTab('pending-projects')">Pending Projects</span>
         </div>
 
-        <div id = "project-container-wrapper">
+        <div class = "project-container-wrapper">
             <div v-show="activeTab === 'my-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'current-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'past-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in pastProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in pastProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'saved-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in savedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in savedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            </div>
+            <div v-show="activeTab === 'pending-projects'" class="project-container">
+                <Card v-for="project in pendingProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
         </div>
     </div> <!--end of main container-->
@@ -482,9 +480,11 @@ export default {
     height:50px;
     width:100%;
     padding:0% 10%;
+    padding-top: 1%;
     font-size:17px;
     font-weight:1000px;
     gap:30px;
+    cursor: pointer;
 }
 
 .tabs span {
@@ -502,21 +502,24 @@ export default {
 }
 
 .project-container-wrapper {
-    display:flex;
-    flex-direction:column;
-    justify-content: center;
-    align-items:center;
-    width:100%;
-    height:30%;
+  width:100%;
+  padding-left:10%;
+  display:flex;
+  flex-direction:column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .project-container {
     display:flex;
-    flex-direction:row;
-    justify-content: space-between;
-    align-items:center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    height:350px;
+    padding-top: 5px;
     width:100%;
-    height:100%;
+    gap: 25px;
+    overflow: scroll;
 }
 
 .projects-cart {
