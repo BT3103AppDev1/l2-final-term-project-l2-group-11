@@ -8,6 +8,7 @@ import Profile from '../views/Profile.vue'
 import EditProfile from '../views/EditProfile.vue'
 import ManagePrj from '../components/ManagePrj.vue'
 import ReviewsPage from "../views/ReviewsPage.vue"
+import CreateProject from "../components/Cppp.vue"
 
 
 const routes = [
@@ -60,6 +61,11 @@ const routes = [
         path: '/ReviewsPage/:userId',
         name: 'ReviewsPage',
         component: ReviewsPage,
+    },
+    {
+        path: '/CreateProject',
+        name: 'CreateProject',
+        component: CreateProject
     }
 ]
 
