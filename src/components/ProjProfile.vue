@@ -72,7 +72,7 @@ export default {
             projectMembers: [],
             membersRequired: 0,
             signupDeadline: "",
-            skillsRequired: [],
+            skillsRequired: "",
             projectStart: "",
             projectEnd: "",
             uid: "",
