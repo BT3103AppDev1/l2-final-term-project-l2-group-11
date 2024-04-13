@@ -140,6 +140,11 @@ export default {
                 linkedin: this.formData.linkedin,
                 instagram: this.formData.instagram,
                 telegram: this.formData.telegram,
+                savedProjects: [],
+                pastProjects: [],
+                currentProjects: [],
+                hostedProjects: [],
+                pendingProjects: [],
                 filledQuestionaire: true,
             }, {merge: true}); //merge true is used to not update the elements that are already in the document
             console.log("document successfully updated!")
