@@ -80,7 +80,7 @@ export default {
         <div id="search-bar">
           <input type="text" v-model="searchInput" placeholder="Search" id="rounded-search" @keyup.enter="submitSearch"/>
           <button @click="searchProjects" id="searchProjectButton">Search</button>
-          <button @click="$router.push('/Cppp')" id="createProjectButton">Create your project</button>
+          <button @click="$router.push('/CreateProject')" id="createProjectButton">Create your project</button>
         </div>
       </div>
 
@@ -143,7 +143,7 @@ export default {
 }
 
 #title-container {
-  height: 250px;
+  height: 200px;
   width:100%;
   background-color: #ffece4;
   text-align: center;
