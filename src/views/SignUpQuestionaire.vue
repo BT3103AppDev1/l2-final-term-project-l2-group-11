@@ -176,10 +176,6 @@ export default {
 
         <div class = "profileSection">
 
-            <!-- <div id = "photo-placeholder">
-                <h2>p</h2>
-            </div> --> 
-
             <div id="photo-placeholder">
                 <img v-if="imageSrc" :src="imageSrc" alt="Profile Preview">
                 <h2 v-else>p</h2>
@@ -205,11 +201,11 @@ export default {
                     <input type = "text" id = "name" v-model = "formData.name" required placeholder = "Enter your name">
                 </div>
                 <div id = "skills">
-                    <label for = "skills">Skills (separate by commas): </label>
+                    <label for = "skills">Skills (separate by commas, and a space after): </label>
                     <input type = "text" id = "skills" v-model = "formData.skills" required placeholder = "Enter your skills">
                 </div>
                 <div id = "interests">
-                    <label for = "interests">Interests (separate by commas): </label>
+                    <label for = "interests">Interests (separate by commas, and a space after): </label>
                     <input type = "text" id = "interests" v-model = "formData.interests" required placeholder = "Enter your interests">
                 </div>
                 <div id = "shortBio">

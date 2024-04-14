@@ -226,15 +226,22 @@ export default {
                         <img :src = "icons.linkedin" alt = "LinkedIn" />
                     </a>
 
+                    <img v-else :src="icons.linkedin" alt="LinkedIn" class="icon-disabled"/> <!--displays Linkedin icon if user link is invalid-->
+
                     <!-- Instagram -->
                     <a v-if="userData.instagram" :href="userData.instagram" target="_blank">
                         <img :src="icons.instagram" alt="Instagram">
                     </a>
 
+                    <img v-else :src="icons.instagram" alt="Instagram" class="icon-disabled"/> <!--displays Instagram icon even if user link is invalid-->
+
                     <!-- Telegram -->
                     <a v-if="userData.telegram" :href="userData.telegram" target="_blank">
                         <img :src="icons.telegram" alt="Telegram">
                     </a>
+
+                    <img v-else :src="icons.telegram" alt="Telegram" class="icon-disabled"/> <!--displays Telegram icon even if user link is invalid-->
+
                 </div> 
             </div> 
         </div>
