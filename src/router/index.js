@@ -46,6 +46,10 @@ const routes = [
         props: true
     },
     {
+        path: '/auth',
+        redirect: '/auth/login' 
+    },
+    {
         path:'/Profile/:userId',
         name: 'Profile',
         component: Profile,
