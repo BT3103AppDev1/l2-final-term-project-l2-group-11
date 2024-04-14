@@ -9,6 +9,7 @@ import EditProfile from '../views/EditProfile.vue'
 import ManagePrj from '../components/ManagePrj.vue'
 import ReviewsPage from "../views/ReviewsPage.vue"
 import CreateProject from "../components/Cppp.vue"
+import RegisterForm from "../components/RegisterForm.vue"
 
 
 const routes = [
@@ -31,6 +32,12 @@ const routes = [
         path: '/auth/:state',
         name: 'Auth',
         component: Authentication,
+    },
+
+    {
+        path: '/auth/register',
+        name: 'Register',
+        component: RegisterForm,
     },
     {
         path: '/SignUpQuestionaire/:userId',
