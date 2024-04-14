@@ -33,12 +33,6 @@ const routes = [
         name: 'Auth',
         component: Authentication,
     },
-
-    {
-        path: '/auth/register',
-        name: 'Register',
-        component: RegisterForm,
-    },
     {
         path: '/SignUpQuestionaire/:userId',
         name: 'SignUpQuestionaire',
@@ -61,7 +55,6 @@ const routes = [
         component: ManagePrj,
     
     },
-
     {
         path: '/Edit-Profile/:userId',
         name: 'EditProfile',
@@ -84,5 +77,6 @@ const router = createRouter({
  history: createWebHistory(),
  routes
 })
+
 
 export default router
