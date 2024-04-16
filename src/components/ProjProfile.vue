@@ -1,7 +1,6 @@
 <template>
     <div class="heading">
-        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
-        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
+        <img src="../assets/CpppImage.png" alt="error" class="center-image"><br><br>
 
         <div class="titleDetail">
             <div class="title">
@@ -12,12 +11,14 @@
                         Edit Project Detail</button>
                     <button id="button2" @click="manageProject">Manage Project</button>
                 </div>
-                <div v-else-if="this.projectMembers.includes(this.uid) || this.pendingMembers.includes(this.uid)"
-                    class="buttonsForMember">
-                    <button id="button1" @click="leaveProject">Leave Project</button>
+                <div v-else-if="this.pendingMembers.includes(this.uid)" class="buttonForPendingApplication">
+                    <button id="button1" @click="withdrawApplication">Withdraw Application</button>
+                </div>
+                <div v-else-if="this.projectMembers.includes(this.uid)" class="buttonsForMember">
+                    <button id="button1" @click="leaveProject">Leave Project ABC</button>
                 </div>
                 <div v-else class="buttonsForOther">
-                    <button id="button1" @click="applyForProject">Appply For Project</button>
+                    <button id="button1" @click="applyForProject">Apply For Project</button>
                     <button id="button2">Save Project</button>
                 </div>
             </div>
@@ -72,12 +73,11 @@ export default {
             projectMembers: [],
             membersRequired: 0,
             signupDeadline: "",
-            skillsRequired: "",
+            skillsRequired: [],
             projectStart: "",
             projectEnd: "",
             uid: "",
             pendingMembers: [],
-            projectBackground: null,
         }
     },
 
@@ -97,7 +97,6 @@ export default {
             this.projectStart = projectData.projectStart.toDate().toDateString();
             this.projectEnd = projectData.projectEnd.toDate().toDateString();
             this.pendingMembers = projectData.pendingMembers;
-            this.projectBackground = projectData.projectBackground;
         },
 
         manageProject() {
@@ -116,41 +115,33 @@ export default {
                 pendingMembers: this.pendingMembers
             });
             alert("Applied for project");
-
-            // reload the page
-            window.location.reload();
         },
 
         async leaveProject() {
-            if (this.projectMembers.includes(this.uid)) {
-                // Remove the user from the project members list
-                this.projectMembers = this.projectMembers.filter(member => member !== this.uid);
-                // Update the project document
-                const docRef = doc(db, "Project Collection", this.projectID)
-                await updateDoc(docRef, {
-                    projectMembers: this.projectMembers,
-                });
-                alert("Left project");
-            }
+            // Remove the user from the project members list
+            this.projectMembers = this.projectMembers.filter(member => member !== this.uid);
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                projectMembers: this.projectMembers,
+            });
+            alert("Left project");
+        },
 
-            else if (this.pendingMembers.includes(this.uid)) {
-                // Remove the user from the pending members list
-                this.pendingMembers = this.pendingMembers.filter(member => member !== this.uid);
-                // Update the project document
-                const docRef = doc(db, "Project Collection", this.projectID)
-                await updateDoc(docRef, {
-                    pendingMembers: this.pendingMembers,
-                });
-                alert("Left project");
-            }
-            // reload the page
-            window.location.reload();
+        async withdrawApplication() {
+            // Remove the user from the pending members list
+            this.pendingMembers = this.pendingMembers.filter(member => member !== this.uid);
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                pendingMembers: this.pendingMembers,
+            });
+            alert("Withdrawn application");
         }
     },
 
     mounted() {
         this.fetchProjectDetails();
-
         const auth = getAuth();
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -199,7 +190,8 @@ img {
 
 .buttonsForHost,
 .buttonsForMember,
-.buttonsForOther {
+.buttonsForOther,
+.buttonForPendingApplication {
     display: flex;
     gap: 100px;
     padding-left: 100px;
