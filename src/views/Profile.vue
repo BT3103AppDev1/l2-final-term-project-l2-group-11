@@ -30,7 +30,6 @@ export default {
             savedProjects: [],
             pendingProjects: [],
             addReviewAvailable : true
-
         };
     },
 
@@ -47,7 +46,6 @@ export default {
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
                 this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
-
                 if (this.uid === props.userId || projectId === null) {
                     this.addReviewAvailable = false;
                 }

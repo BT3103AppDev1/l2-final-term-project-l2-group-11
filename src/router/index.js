@@ -44,7 +44,6 @@ const routes = [
         redirect: '/auth/login' 
     },
     {
-
         path:'/Profile/:userId/:projectId?',
         name: 'Profile',
         component: Profile,

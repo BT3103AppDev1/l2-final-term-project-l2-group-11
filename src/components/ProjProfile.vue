@@ -2,6 +2,7 @@
     <div class = "proj-profile-wrapper">
     <div class="heading">
         <img src="../assets/CpppImage.png" alt="error" class="center-image">
+
         <div class="titleDetail">
             <div class="title">
                 <h1 id="projTitle">{{ projectName }}</h1>
@@ -12,7 +13,6 @@
                         Edit Project Detail</button>
                     <button id="button2" @click="manageProject">Manage Project</button>
                 </div>
-
 
                 <div v-else-if="this.pendingMembers.includes(this.uid)" class="buttonForPendingApplication">
                     <button id="button1" @click="withdrawApplication">Withdraw Application</button>
@@ -125,6 +125,7 @@ export default {
             this.projectStart = projectData.projectStart.toDate().toDateString();
             this.projectEnd = projectData.projectEnd.toDate().toDateString();
             this.pendingMembers = projectData.pendingMembers;
+
         },
 
         manageProject() {
