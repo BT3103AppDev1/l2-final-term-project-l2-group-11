@@ -16,7 +16,7 @@ export default {
         Card
     },
 
-    props: ['userId'],
+    props: ['userId',"projectId"],
 
     data() {
         return {
@@ -28,7 +28,9 @@ export default {
             currentProjects: [],
             pastProjects: [],
             savedProjects: [],
-            pendingProjects: []  
+            pendingProjects: [],
+            addReviewAvailable : true
+
         };
     },
 
@@ -37,7 +39,7 @@ export default {
             if (user) {
                 this.userstate = true; // User is logged in
                 this.uid = user.uid;
-                const userRef = doc(db, 'User Information', this.uid);
+                const userRef = doc(db, 'User Information', props.userId);
                 const userSnap = await getDoc(userRef);
                 this.userProfile = userSnap.data();
                 this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects);
@@ -45,6 +47,10 @@ export default {
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
                 this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
+
+                if (this.uid === props.userId || projectId === null) {
+                    this.addReviewAvailable = false;
+                }
             } else {
                 this.userstate = false;
             }
@@ -120,7 +126,7 @@ export default {
         const icons = ref({
             linkedin: '',
             instagram: '',
-            telegram: ''
+            telegram: '',
         });
 
         const storage = getStorage(firebaseApp);
@@ -216,8 +222,8 @@ export default {
             </div>
 
             <div class = "socialMediaWrapper"> <!--to wrap the social media icons on the rhs-->
-                <button id = "edit-profile" @click = "editProfile"> Edit Profile </button>
-                <button id = 'reviewsButton' @click = "goToReviewsPage">Reviews</button>
+                <button v-show = "uid === userId"id = "edit-profile" @click = "editProfile"> Edit Profile </button>
+                <button id = 'reviewsButton' @click = "goToReviewsPage" :addReviewAvailable = "addReviewAvailable" :userId = "userId">Reviews</button>
 
                 <h2 class="socialMediaHeading">Social Media</h2> <!-- Heading for the icons -->
 
@@ -387,7 +393,7 @@ export default {
 }
 
 .tags-container {
-    height:120px;
+    height:50px;
     width:100%;
     display:flex;
     flex-direction:row;
@@ -487,7 +493,7 @@ export default {
     height:50px;
     width:100%;
     padding:0% 10%;
-    padding-top: 1%;
+    padding-top: 20px;
     font-size:17px;
     font-weight:1000px;
     gap:30px;

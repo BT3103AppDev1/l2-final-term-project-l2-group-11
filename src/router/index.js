@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Authentication from '../views/AuthenticationPage.vue'
 import About from '../views/About.vue'
 import Project from '../views/Project.vue'
-import ProjProfile from '../components/ProjProfile.vue'
+import ProjectProfile from '../views/ProjectProfile.vue'
 import SignUpQuestionaire from '../views/SignUpQuestionaire.vue'
 import Profile from '../views/Profile.vue'
 import EditProfile from '../views/EditProfile.vue'
@@ -26,7 +26,7 @@ const routes = [
     {
         path: '/project/:id',
         name: 'ProjProfile',
-        component: ProjProfile,
+        component: ProjectProfile,
     },
     {
         path: '/auth/:state',
@@ -44,7 +44,8 @@ const routes = [
         redirect: '/auth/login' 
     },
     {
-        path:'/Profile/:userId',
+
+        path:'/Profile/:userId/:projectId?',
         name: 'Profile',
         component: Profile,
         props:true 

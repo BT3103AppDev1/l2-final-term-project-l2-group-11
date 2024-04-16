@@ -4,6 +4,9 @@
             <label for = "auth-email-input">Email Address</label>
             <input type = "text" v-model = "EmailAddress" id = "auth-email-input" placeholder = " Email address">
         </div>
+
+        <button class = "request-reset-link-button" v-show = "state == 'Verify'" type = "button" :disabled = "EmailAddress == ''" v-on:click.prevent = "resetPasswordRequest">Request Reset Password Link </button>
+        <!--
         <div v-show = "state == 'Verified'" class = "label-input-div">
             <label for = "auth-password-input">Password</label>
             <input type = "text" v-model = "Password" id = "auth-password-input" placeholder = " Password">
@@ -12,7 +15,7 @@
             <label for = "auth-verification-code-input">Verification Code</label>
             <div class = "auth-verification-code-input-div">
                 <input type = "text" v-model = "VerificationCode" id = "auth-verification-code-input" placeholder = " Verification Code">
-                <button type = "button" :disabled = "EmailAddress == ''" v-on:click = "requestCode">Request Code</button>
+                <button type = "button" :disabled = "EmailAddress == ''" v-on:click = "resetPasswordRequest">Request Code</button>
             </div>
         </div>
 
@@ -22,6 +25,7 @@
         </div>
         <button v-show = "state == 'Verified'" type = "button" :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" v-on:click.prevent = "resetPassword">Reset</button>
         <button v-show = "state == 'Verify'" type = "button" :disabled = "EmailAddress == '' && VerificationCode == ''" v-on:click.prevent = "verify">Verify</button>
+    -->
     </form>
 </template>
 
@@ -29,7 +33,11 @@
 import firebaseApp from "../Firebase.js";
 import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail} from "firebase/auth";
+const actionCodeSettings = {
+  url: 'https://http://localhost:5174/auth/login',
+  handleCodeInApp: true
+};
 
 export default {
     data() {
@@ -44,6 +52,16 @@ export default {
         }
     },
     methods : {
+        resetPasswordRequest() {
+            sendPasswordResetEmail(getAuth(firebaseApp), this.EmailAddress)
+            .then( () => {
+                alert("A an email has been sent to reset your password, please check your email!");
+                this.$emit("changeStateToLogin");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        },
         requestCode() {
 
         },
@@ -53,7 +71,8 @@ export default {
         resetPassword() {
 
         }       
-    }
+    },
+    emits:["changeStateToLogin"]
 }
 </script>
 
@@ -105,8 +124,8 @@ export default {
     background-color: #F5793B;
     color:#FDF8F6;
     font-size: 13px;
-    height:30px;
-    width: 65px;
+    height:35px;
+    width: 350px;
     border-radius:3px;   
 }
 
@@ -119,4 +138,6 @@ export default {
     height:35px;
     border-radius: 0px 3px 3px 0px;
 }
+
+
 </style>

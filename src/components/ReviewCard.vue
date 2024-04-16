@@ -5,15 +5,25 @@
                 <img v-bind:src = "reviewDetails.reviewerProfilePic"/>
                 <h5>{{ reviewDetails.reviewerUsername }}</h5>
             </div>
-            <h5>Date of Review: {{ reviewDetails.date }}</h5>
+            <h5 class = "review-date">Date of Review: {{ reviewDetails.date }}</h5>
         </div>
-            <img v-if = "reviewDetails.ratings === 5" src = "../assets/rating.png" class = "ratings"/>
-            <img v-else-if = "reviewDetails.ratings === 4" src = "../assets/rating.png" class = "ratings"/>
-            <img v-else-if = "reviewDetails.ratings === 3" src = "../assets/rating.png" class = "ratings"/>
-            <img v-else-if = "reviewDetails.ratings === 2" src = "../assets/rating.png" class = "ratings"/>
-            <img v-else src = "../assets/rating.png" class = "ratings"/>
 
-        <h3>{{ reviewDetails.projectTitle }}</h3>
+        <div class = "ratings">
+            <img src = "../assets/lit-star.png"/>
+            <img v-if = "parseInt(reviewDetails.ratings) < 2" src = "../assets/unlit-star.png"/>
+            <img v-else src = "../assets/lit-star.png"/>
+
+            <img v-if = "parseInt(reviewDetails.ratings) < 3" src = "../assets/unlit-star.png"/>
+            <img v-else  src = "../assets/lit-star.png"/>
+
+            <img v-if = "parseInt(reviewDetails.ratings) < 4" src = "../assets/unlit-star.png"/>
+            <img v-else src = "../assets/lit-star.png"/>
+
+            <img v-if = "parseInt(reviewDetails.ratings) < 5" src = "../assets/unlit-star.png"/>
+            <img v-else src = "../assets/lit-star.png"/>
+        </div>
+
+        <h3 class = "project-title">{{ reviewDetails.projectTitle }}</h3>
         <div class = "review">
             <p>{{reviewDetails.review}}</p>
         </div>
@@ -34,10 +44,10 @@ export default {
 .review-card-container {
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    justify-content:flex-start;
     align-items:left;
-    width:100%;
-    height:100%;
+    width:700px;
+    height:300px;
 }
 
 .review-header {
@@ -46,7 +56,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     width:100%;
-    height:20%;
+    height:50px;
 }
 
 .review-header h5 {
@@ -57,9 +67,9 @@ export default {
 .reviewer-details {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    gap:10px;
     align-items: center;
-    width:100px;
+    width:60%;
     height:100%;
 }
 
@@ -68,29 +78,47 @@ export default {
     width:40px;
     object-fit:cover;
     border-radius: 50%;
+    border:1px solid black;
 }
 
 .reviewer-details h5 {
-    font-size: 17px;
-    margin-left:7px;
+    font-size: 15px;
 }
 
-.review-card-container h3 {
-    font-weight:bold;
+.review-date {
+    width:40%;
+    text-align: right;
+    font-size: 15px;
+}
+
+.ratings {
+    margin-top:10px;
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap:2px;
+    height:20px;
+    width:100%;
+}
+.ratings img {
+    height:20px;
+    width:20px;
+    object-fit: contain;
+}
+
+.project-title {
+    margin-top:10px;
+    font-size:20px;
     color:orange;
-}
-
-img.ratings {
-    height:50px;
-    width:70px;
-    object-fit: cover;
+    font-weight: bold;
 }
 
 .review {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: left;
     width:100%;
     color:black;
 }
