@@ -16,7 +16,7 @@ export default {
         Card
     },
 
-    props: ['userId'],
+    props: ['userId',"projectId"],
 
     data() {
         return {
@@ -27,7 +27,9 @@ export default {
             hostedProjects: [],
             currentProjects: [],
             pastProjects: [],
-            savedProjects: [],  
+            savedProjects: [],
+            pendingProjects: [],
+            addReviewAvailable : true
         };
     },
 
@@ -36,13 +38,17 @@ export default {
             if (user) {
                 this.userstate = true; // User is logged in
                 this.uid = user.uid;
-                const userRef = doc(db, 'User Information', this.uid);
+                const userRef = doc(db, 'User Information', props.userId);
                 const userSnap = await getDoc(userRef);
                 this.userProfile = userSnap.data();
                 this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects);
                 this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects);
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
+                this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
+                if (this.uid === props.userId || projectId === null) {
+                    this.addReviewAvailable = false;
+                }
             } else {
                 this.userstate = false;
             }
@@ -118,7 +124,7 @@ export default {
         const icons = ref({
             linkedin: '',
             instagram: '',
-            telegram: ''
+            telegram: '',
         });
 
         const storage = getStorage(firebaseApp);
@@ -214,8 +220,8 @@ export default {
             </div>
 
             <div class = "socialMediaWrapper"> <!--to wrap the social media icons on the rhs-->
-                <button id = "edit-profile" @click = "editProfile"> Edit Profile </button>
-                <button id = 'reviewsButton' @click = "goToReviewsPage">Reviews</button>
+                <button v-show = "uid === userId"id = "edit-profile" @click = "editProfile"> Edit Profile </button>
+                <button id = 'reviewsButton' @click = "goToReviewsPage" :addReviewAvailable = "addReviewAvailable" :userId = "userId">Reviews</button>
 
                 <h2 class="socialMediaHeading">Social Media</h2> <!-- Heading for the icons -->
 
@@ -224,15 +230,22 @@ export default {
                         <img :src = "icons.linkedin" alt = "LinkedIn" />
                     </a>
 
+                    <img v-else :src="icons.linkedin" alt="LinkedIn" class="icon-disabled"/> <!--displays Linkedin icon if user link is invalid-->
+
                     <!-- Instagram -->
                     <a v-if="userData.instagram" :href="userData.instagram" target="_blank">
                         <img :src="icons.instagram" alt="Instagram">
                     </a>
 
+                    <img v-else :src="icons.instagram" alt="Instagram" class="icon-disabled"/> <!--displays Instagram icon even if user link is invalid-->
+
                     <!-- Telegram -->
                     <a v-if="userData.telegram" :href="userData.telegram" target="_blank">
                         <img :src="icons.telegram" alt="Telegram">
                     </a>
+
+                    <img v-else :src="icons.telegram" alt="Telegram" class="icon-disabled"/> <!--displays Telegram icon even if user link is invalid-->
+
                 </div> 
             </div> 
         </div>
@@ -241,28 +254,24 @@ export default {
             <span :class="{active: activeTab === 'current-projects'}" @click="setActiveTab('current-projects')">Current Projects</span>
             <span :class="{active: activeTab === 'past-projects'}" @click="setActiveTab('past-projects')">Past Projects</span>
             <span :class="{active: activeTab === 'saved-projects'}" @click="setActiveTab('saved-projects')">Saved Projects</span>
+            <span :class="{active: activeTab === 'pending-projects'}" @click="setActiveTab('pending-projects')">Pending Projects</span>
         </div>
 
-        <div id = "project-container-wrapper">
+        <div class = "project-container-wrapper">
             <div v-show="activeTab === 'my-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'current-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'past-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in pastProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in pastProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
             <div v-show="activeTab === 'saved-projects'" class="project-container">
-                <div class="projects-cart">
-                    <Card v-for="project in savedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-                </div>
+                <Card v-for="project in savedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+            </div>
+            <div v-show="activeTab === 'pending-projects'" class="project-container">
+                <Card v-for="project in pendingProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
         </div>
     </div> <!--end of main container-->
@@ -382,7 +391,7 @@ export default {
 }
 
 .tags-container {
-    height:120px;
+    height:50px;
     width:100%;
     display:flex;
     flex-direction:row;
@@ -482,9 +491,11 @@ export default {
     height:50px;
     width:100%;
     padding:0% 10%;
+    padding-top: 20px;
     font-size:17px;
     font-weight:1000px;
     gap:30px;
+    cursor: pointer;
 }
 
 .tabs span {
@@ -502,21 +513,24 @@ export default {
 }
 
 .project-container-wrapper {
-    display:flex;
-    flex-direction:column;
-    justify-content: center;
-    align-items:center;
-    width:100%;
-    height:30%;
+  width:100%;
+  padding-left:10%;
+  display:flex;
+  flex-direction:column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .project-container {
     display:flex;
-    flex-direction:row;
-    justify-content: space-between;
-    align-items:center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    height:350px;
+    padding-top: 5px;
     width:100%;
-    height:100%;
+    gap: 25px;
+    overflow: scroll;
 }
 
 .projects-cart {
