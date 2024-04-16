@@ -1,8 +1,8 @@
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
     <div class="background">
-        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
-        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
+        <img id="backgroundImage" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="backgroundImage" v-else src="../assets/CpppImage.png" alt="not found">
         <br>
         <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
         <!-- Hidden file input -->
@@ -14,8 +14,8 @@
         <div class="left-side">
             <div class="thumbnail">
                 <div class="thumbnailImage">
-                    <img id="thumbnail" v-if="projectImage" :src="projectImage" alt="not found">
-                    <img id="thumbnail" v-else src="../assets/CpppThumbnail.png" alt="not found">
+                    <img id="image" v-if="projectImage" :src="projectImage" alt="not found">
+                    <img id="image" v-else src="../assets/CpppThumbnail.png" alt="not found">
                 </div> <br>
 
                 <div class="addThumbnailButton">
@@ -255,6 +255,12 @@ h3 {
 
 .background {
     text-align: center;
+    overflow: hidden;
+}
+
+#backgroundImage {
+    height: 200px;
+    width: 80%;
 }
 
 .thumbnail {
@@ -265,6 +271,13 @@ h3 {
 .thumbnailImage {
     width: 50%;
     text-align: right;
+    overflow: hidden;
+}
+
+.thumbnailImage img {
+    height: 180px;
+    width: 360px;
+    height: auto;
 }
 
 .container {

@@ -66,12 +66,20 @@
                 this.uid = user.uid;
                 const docRef = doc(db, "User Information", user.uid);
                 const docSnap = await getDoc(docRef);
-                this.userProfile = docSnap.data();
-                this.profileImageUrl = this.userProfile.profileImageUrl;
+                if (docSnap.exists()) {
+                  this.profileImageUrl = docSnap.data().profileImageUrl || '';
+                  console.log('User Data:', docSnap.data());
+                  console.log('Questionaire Filled:', docSnap.data().questionaireFilled);
+                  if (!docSnap.data().questionaireFilled) {
+                    console.log('Redirecting to SignUpQuestionaire');
+                    this.$router.push({ name: 'SignUpQuestionaire', params: { userId: user.uid } });
+                  }
+                } 
             } else {
                 this.isLoggedIn = false;
                 this.uid = '';
                 this.userProfile = null;
+                this.profileImageUrl = '';
             }
         });
     }

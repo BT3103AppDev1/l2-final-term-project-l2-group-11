@@ -62,7 +62,7 @@ export default {
     
     methods: {
         gotoAuth() {
-            this.$router.push("/auth");
+            this.$router.push("/auth/register");
         }
     }
 }
