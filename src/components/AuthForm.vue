@@ -24,7 +24,7 @@ import ResetPasswordForm from "./ResetPasswordForm.vue";
         <div v-if = "authOption === 'Email'" class = "auth-form-wrapper">
             <LoginForm v-if = "state == 'Login'" />
             <RegisterForm v-else-if= "state == 'Register'" />
-            <ResetPasswordForm v-else />
+            <ResetPasswordForm v-else @changeStateToLogin = "toggleAuthState" />
         </div>
         <div v-else class = "auth-form-wrapper">
 
@@ -57,8 +57,9 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 export default {
     data() {
+        let state = this.$route.params.state === "login" ? "Login" : "Register";
         return {
-            state: "Login",
+            state: state,
             authOption : false
         }
     },
