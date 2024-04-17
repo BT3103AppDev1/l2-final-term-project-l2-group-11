@@ -54,7 +54,7 @@ export default {
         async submitReviewForm() {
             alert("review submited!");
             let reviewerID = this.uid;
-            let reviewRef = doc(db, "User Information", "" + this.$route.params.userId, "Reviews", uuidv4());
+            let reviewRef = doc(db, "User Information", "" + this.profileUserId, "Reviews", uuidv4());
             let currentDate = new Date();
             let day = currentDate.getDate();
             let month = currentDate.getMonth() + 1;
@@ -71,6 +71,7 @@ export default {
             this.review = "";
             this.projectTitle = "";
             this.$emit("uploadReview");
+            this.$emit("closeReviewFormPopup");
         },
         closeReviewForm() {
             this.$emit("closeReviewFormPopup");
@@ -97,6 +98,7 @@ export default {
     emits: ["closeReviewFormPopup", "uploadReview"],
     props : {
         uid : String,
+        profileUserId : String
     }
 }
 </script>
