@@ -16,7 +16,10 @@ export default {
         Card
     },
 
-    props: ['userId',"projectId"],
+    props: [
+        "userId",
+        "projectId"
+    ],
 
     data() {
         return {
@@ -38,7 +41,7 @@ export default {
             if (user) {
                 this.userstate = true; // User is logged in
                 this.uid = user.uid;
-                const userRef = doc(db, 'User Information', props.userId);
+                const userRef = doc(db, 'User Information', this.userId);
                 const userSnap = await getDoc(userRef);
                 this.userProfile = userSnap.data();
                 this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects);
@@ -46,7 +49,7 @@ export default {
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
                 this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
-                if (this.uid === props.userId || projectId === null) {
+                if (this.uid === this.userId || projectId === null) {
                     this.addReviewAvailable = false;
                 }
             } else {
@@ -107,7 +110,7 @@ export default {
         },
 
         editProfile() {
-            this.$router.push({name: 'EditProfile', params: {userId: this.userId }});
+            this.$router.push({name: 'EditProfile', params: {userId: this.uid }});
         },
 
         goToReviewsPage() {
@@ -131,9 +134,8 @@ export default {
 
     //load user data while page loads
         onMounted(async () => {
-            console.log(props.userId);
             const db = getFirestore();
-            const docRef = doc(db, 'User Information', props.userId);  
+            const docRef = doc(db, 'User Information', "" + props.userId);  
             //of the authentication state of the page. e.g. whether the user is logged in 
             
             try{
@@ -221,7 +223,7 @@ export default {
 
             <div class = "socialMediaWrapper"> <!--to wrap the social media icons on the rhs-->
                 <button v-show = "uid === userId"id = "edit-profile" @click = "editProfile"> Edit Profile </button>
-                <button id = 'reviewsButton' @click = "goToReviewsPage" :addReviewAvailable = "addReviewAvailable" :userId = "userId">Reviews</button>
+                <button id = 'reviewsButton' @click = "goToReviewsPage" :addReviewAvailable = "addReviewAvailable">Reviews</button>
 
                 <h2 class="socialMediaHeading">Social Media</h2> <!-- Heading for the icons -->
 

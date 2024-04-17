@@ -5,7 +5,7 @@ import AddReviewsForm from "../components/AddReviewsForm.vue";
 
 <template>
     <div v-show = "reviewFormPopup" class = "add-review-form">
-        <AddReviewsForm @closeReviewFormPopup = "closeAddReviewPopup" @uploadReview = "refreshReviews" :uid = "uid" />
+        <AddReviewsForm @closeReviewFormPopup = "closeAddReviewPopup" @uploadReview = "refreshReviews" :uid = "uid" :profileUserId = "profileUserId"/>
     </div>
 
     <div class = "reviews-page-wrapper" :class = "{'block-background' : reviewFormPopup}">
@@ -42,7 +42,8 @@ export default {
             reviews: [],
             loading: true,
             uid:null,
-            reviewFormPopup:false
+            reviewFormPopup:false,
+            profileUserId : this.$route.params.userId
         }
     },
     mounted() {
@@ -67,7 +68,7 @@ export default {
             this.reviewFormPopup = false;
         },
         async fetchReviews() {
-            let fetchedReviews = await getDocs(collection(db,"User Information","" + props.userId, "Reviews"));
+            let fetchedReviews = await getDocs(collection(db,"User Information","" + this.profileUserId, "Reviews"));
             let listReviewsData = [];
             if (fetchedReviews.empty) {
                 return ;
@@ -90,10 +91,6 @@ export default {
         refreshReviews() {
             this.fetchReviews();
         }
-    },
-    props : {
-        addReviewAvailable : Boolean,
-        userId : String
     }
 }
 </script>
