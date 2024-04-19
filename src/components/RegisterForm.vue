@@ -13,7 +13,7 @@
             <label for = "auth-confirm-password-input">Confirm Password</label>
             <input type = "password" autocomplete = "off" v-model = "ConfirmPassword" id = "auth-confirm-password-input" placeholder = "confirm password">
         </div>
-        <button type = "button" :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" v-on:click.prevent = "register">Register</button>
+        <button type = "button" v-on:click.prevent = "register">Register</button>
     </form>
 </template>
 
@@ -35,11 +35,16 @@ export default {
     },
     methods : {
         async register() {
-            this.loading = true;
+            let regex =  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]/;
+
             if (this.Password != this.ConfirmPassword) {
-                this.loading = false;
                 alert("Passwords do not match, please try again");
-            } else {
+            } else if (!regex.test(this.Password)) {
+                console.log(this.Password);
+                console.log(regex.test(this.Password));
+                alert("Password has to contain a least one special, one uppercase and one lowercase character and has to be at least 8 character long");
+            }
+            else {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(getAuth(), this.EmailAddress.toLowerCase(), this.Password)
                     const user = userCredential.user;
@@ -58,6 +63,7 @@ export default {
                 } catch(error) {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                alert("Registeration is not successful, please try again!");
             };
             }
             this.loading = false;
@@ -119,7 +125,4 @@ export default {
     border-radius:3px;   
 }
 
-#authForm button:disabled {
-    background-color: grey;
-}
 </style>
