@@ -1,8 +1,8 @@
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
     <div class="background">
-        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
-        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
+        <img id="backgroundImage" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="backgroundImage" v-else src="../assets/CpppImage.png" alt="not found">
         <br>
         <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
         <!-- Hidden file input -->
@@ -49,29 +49,29 @@
             </div> <br>
 
             <div class="signUpDeadline">
-                <h3>Sign Up Deadline (DD/MM/YYYY)</h3>
-                <textarea id="signUpDeadline" required v-model="signupDeadline"></textarea>
+                <h3>Sign Up Deadline</h3>
+                <input type="date" id="signUpDeadline" required v-model="signupDeadline">
             </div> <br>
 
             <div class="projectStart">
-                <h3>Project Start Date (DD/MM/YYYY)</h3>
-                <textarea id="projectStart" required v-model="projectStart"></textarea>
+                <h3>Project Start Date</h3>
+                <input type="date" id="projectStart" required v-model="projectStart">
             </div> <br>
 
             <div class="projectEnd">
-                <h3>Project End Date (DD/MM/YYYY)</h3>
-                <textarea id="projectEnd" required v-model="projectEnd"></textarea>
+                <h3>Project End Date</h3>
+                <input type="date" id="projectEnd" required v-model="projectEnd">
             </div> <br>
 
             <div class="findOutMore">
                 <h3>Link</h3>
-                <textarea id="findOutMore" required v-model="findOutMore"></textarea>
+                <textarea id="findOutMore" v-model="findOutMore"></textarea>
             </div>
         </div>
     </div> <br>
 
     <div class="launchProj">
-        <button @click="launchProject(), $router.push('Project')">Launch Project</button>
+        <button @click="launchProject(), $router.push('Project')" :disabled="skillsRequired=='' || membersRequired=='' || projectDescription=='' || projectName==''">Launch Project</button>
     </div>
 </template>
 
@@ -115,40 +115,40 @@ export default {
             document.body.style.backgroundColor = color;
         },
 
-        isValidDate(dateStr) {
-            const regex = /^\d{2}\/\d{2}\/\d{4}$/; // Checks for the "DD/MM/YYYY" format
-            if (!dateStr.match(regex)) {
-                return false; // Returns false if date does not match the format
-            }
+        // isValidDate(dateStr) {
+        //     const regex = /^\d{2}\/\d{2}\/\d{4}$/; // Checks for the "DD/MM/YYYY" format
+        //     if (!dateStr.match(regex)) {
+        //         return false; // Returns false if date does not match the format
+        //     }
 
-            const [day, month, year] = dateStr.split("/").map(Number);
-            const date = new Date(year, month - 1, day); // Creates a Date object
+        //     const [day, month, year] = dateStr.split("/").map(Number);
+        //     const date = new Date(year, month - 1, day); // Creates a Date object
 
-            const now = new Date(); // Current date for comparison
-            now.setHours(0, 0, 0, 0); // Normalize current date to avoid hour-minute-second comparison
+        //     const now = new Date(); // Current date for comparison
+        //     now.setHours(0, 0, 0, 0); // Normalize current date to avoid hour-minute-second comparison
 
-            // Check if it's a valid date and not in the past
-            if (date.getTime() < now.getTime() || date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
-                return false;
-            }
+        //     // Check if it's a valid date and not in the past
+        //     if (date.getTime() < now.getTime() || date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
+        //         return false;
+        //     }
 
-            return true;
-        },
+        //     return true;
+        // },
 
-        compareDates(start, end) {
-            const [startDay, startMonth, startYear] = start.split("/").map(Number);
-            const [endDay, endMonth, endYear] = end.split("/").map(Number);
+        // compareDates(start, end) {
+        //     const [startDay, startMonth, startYear] = start.split("/").map(Number);
+        //     const [endDay, endMonth, endYear] = end.split("/").map(Number);
 
-            const startDate = new Date(startYear, startMonth - 1, startDay);
-            const endDate = new Date(endYear, endMonth - 1, endDay);
+        //     const startDate = new Date(startYear, startMonth - 1, startDay);
+        //     const endDate = new Date(endYear, endMonth - 1, endDay);
 
-            return endDate > startDate; // True if end date is after start date
-        },
+        //     return endDate > startDate; // True if end date is after start date
+        // },
 
         convertDateToTimestamp(dateStr) {
-            // Assuming dateStr is in "DD/MM/YYYY"
-            const parts = dateStr.split("/"); // Split the string into parts
-            const date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object, note months are 0-indexed
+            // Assuming dateStr is in "YYYY-MM-DD"
+            const parts = dateStr.split("-"); // Split the string into parts
+            const date = new Date(parts[0], parts[1] - 1, parts[2]); // Create a new Date object, note months are 0-indexed
 
             return Timestamp.fromDate(date); // Convert the Date object to a Firestore Timestamp
         },
@@ -157,20 +157,6 @@ export default {
             console.log("IN LP")
             alert(" Launching your project : " + projectName)
 
-            if (!this.isValidDate(this.projectStart) || !this.isValidDate(this.projectEnd) || !this.isValidDate(this.signupDeadline)) {
-                alert("One or more dates have invalid format or in the past.");
-                return;
-            }
-
-            if (!this.compareDates(this.projectStart, this.projectEnd)) {
-                alert("The project end date must be after the project start date.");
-                return;
-            }
-
-            if (!this.compareDates(this.signupDeadline, this.projectEnd)) {
-                alert("The signup deadline must be before the project end date.");
-                return;
-            }
             try {
                 const docRef = await addDoc(collection(db, "Project Collection"), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
@@ -396,5 +382,9 @@ textarea {
 .launchProj {
     display: flex;
     justify-content: center;
+}
+
+.launchProj button:disabled {
+    background-color: gray;
 }
 </style>
