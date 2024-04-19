@@ -23,8 +23,10 @@
         <section class="member-list" v-if="isCurrentMembersActive">
             <div class="member-item" v-for="member in projectMembers">
                 <div class="member-info">
-                    <div class="member-avatar"></div>
-                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-avatar">
+                        <img v-bind:src = member.profileImageUrl>
+                    </div>
+                    <div class="member-name" v-on:click="visitProfilePage(member.userId)">{{ member.name }}</div>
                 </div>
                 <div class="pos-button"><button class="remove-btn" @click="removeMember(member.userID)">Remove</button>
                 </div>
@@ -34,8 +36,10 @@
         <section class="member-list" v-if="!isCurrentMembersActive">
             <div class="member-item" v-for="member in pendingMembers">
                 <div class="member-info">
-                    <div class="member-avatar"></div>
-                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-avatar">
+                        <img v-bind:src = member.profileImageUrl>
+                    </div>
+                    <div class="member-name" v-on:click="visitProfilePage(member.userId)" >{{ member.name }}</div>
                 </div>
                 <div class="pos-button">
                     <button class="reject-btn" @click="rejectMember(member.userID)">Reject</button>
@@ -102,14 +106,14 @@ export default {
                 let userDocRef = doc(db, "User Information", memberID);
                 let userDocSnap = await getDoc(userDocRef);
                 let userData = userDocSnap.data();
-                this.projectMembers.push({ name: userData.name, userID: memberID });
+                this.projectMembers.push({ name: userData.name, userID: memberID, profileImageUrl: userData.profileImageUrl });
             }
 
             for (const memberID of this.pendingID) {
                 let userDocRef = doc(db, "User Information", memberID);
                 let userDocSnap = await getDoc(userDocRef);
                 let userData = userDocSnap.data();
-                this.pendingMembers.push({ name: userData.name, userID: memberID });
+                this.pendingMembers.push({ name: userData.name, userID: memberID, profileImageUrl: userData.profileImageUrl });
             }
 
         },
@@ -207,6 +211,10 @@ export default {
 
             router.push('/project');
         },
+
+        visitProfilePage(userId) {
+            this.$router.push("/Profile/" + userId);
+        }
     },
 
 }
@@ -293,13 +301,6 @@ img {
     line-height: 1.2;
 }
 
-.member-avatar {
-    width: 47px;
-    height: 47px;
-    border-radius: 50%;
-    background-color: rgba(245, 121, 59, 0.7);
-}
-
 .member-name {
     font-family: Inter, sans-serif;
     white-space: nowrap;
@@ -351,4 +352,13 @@ img {
 
 
 }
+
+.member-avatar img {
+    height:40px;
+    width:40px;
+    object-fit:cover;
+    border-radius: 50%;
+    border:1px solid black;
+}
 </style>
+
