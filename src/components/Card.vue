@@ -15,8 +15,11 @@
                 </div>
 
                 <div class="card-footer">
-                    <div class="footer-section time">
-                        <span>{{ daysToDeadline }} days to go</span>
+                    <div v-if = "this.projectCompleted" class="footer-section time">
+                        <span>Project Completed</span>
+                    </div>
+                    <div v-else class="footer-section time">
+                        <span>{{ this.numDays }} days to go</span>
                     </div>
                     <div class = "bookmark-icon">
                         <img @click.stop = "toggleBookmark" v-if = "this.bookmarked" src = "../assets/bookmark.png"/>
@@ -41,11 +44,11 @@
                 </div>
 
                 <div class="card-footer">
-                    <div v-if = "this.project.projectCompleted" class="footer-section time">
+                    <div v-if = "this.projectCompleted" class="footer-section time">
                         <span>Project Completed</span>
                     </div>
                     <div v-else class="footer-section time">
-                        <span>{{ daysToDeadline }} days to go</span>
+                        <span>{{ this.numDays }} days to go</span>
                     </div>
                 </div>
             </div>
@@ -70,7 +73,9 @@ export default {
             uid: '',
             bookmarked: false,
             userProfile: null,
-            savedProjects:[]
+            savedProjects:[],
+            projectCompleted: false,
+            numDays: 0
         }
     },
 
@@ -84,6 +89,7 @@ export default {
                 this.userProfile = userSnap.data();
                 this.savedProjects = this.userProfile.savedProjects;
                 this.bookmarked = this.savedProjects.includes(this.project.id);
+                this.numDays = Math.round((this.project.projectEnd.toDate().getTime() - new Date().getTime())/(1000 * 3600 * 24));
             } else {
                 this.userstate = false; // User is not logged in
                 this.uid = '';
@@ -94,6 +100,7 @@ export default {
         if (this.project.projectEnd.toDate().getTime() < new Date().getTime()) {
             const docRef = doc(db, 'Project Collection', this.project.id);
             await updateDoc(docRef, {projectCompleted: true});
+            this.projectCompleted = true;
             let hostID = this.project.projectHost;
             const hostRef = doc(db, 'User Information', hostID);
             await updateDoc(hostRef, {currentProjects: arrayRemove(this.project.projectID)});
@@ -140,12 +147,6 @@ export default {
 
         goToLogin() {
             this.$router.push("/auth/register")
-        }
-
-    },
-    computed: {
-        daysToDeadline(){
-            return Math.round((this.project.projectEnd.toDate().getTime() - new Date().getTime())/(1000 * 3600 * 24))
         }
     }
 }
