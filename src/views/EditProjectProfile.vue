@@ -1,10 +1,10 @@
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
     <div class="background">
-        <img id="background" v-if="projectBackground" :src="projectBackground" alt="not found">
-        <img id="background" v-else src="../assets/CpppImage.png" alt="not found">
+        <img id="backgroundImage" v-if="projectBackground" :src="projectBackground" alt="not found">
+        <img id="backgroundImage" v-else src="../assets/CpppImage.png" alt="not found">
         <br>
-        <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
+        <button id="addBackground" @click="triggerFileUploadForBackground">Change Background</button>
         <!-- Hidden file input -->
         <input type="file" id="backgroundUpload" ref="backgroundUpload" @change="handleBackgroundUpload($event)"
             style="display: none;">
@@ -20,7 +20,7 @@
 
                 <div class="addThumbnailButton">
                     <br> <br>
-                    <button id="addThumbnail" @click="triggerFileUpload">Add Thumbnail</button>
+                    <button id="addThumbnail" @click="triggerFileUpload">Change Thumbnail</button>
                 </div> <br>
                 <!-- Hidden file input -->
                 <input type="file" id="photoUpload" ref="photoUpload" @change="handleFileUpload($event)"
@@ -49,17 +49,17 @@
             </div> <br>
 
             <div class="signUpDeadline">
-                <h3>Sign Up Deadline (DD/MM/YYYY)</h3>
+                <h3>Sign Up Deadline</h3>
                 <textarea id="signUpDeadline" required v-model="signupDeadline"></textarea>
             </div> <br>
 
             <div class="projectStart">
-                <h3>Project Start Date (DD/MM/YYYY)</h3>
+                <h3>Project Start Date</h3>
                 <textarea id="projectStart" required v-model="projectStart"></textarea>
             </div> <br>
 
             <div class="projectEnd">
-                <h3>Project End Date (DD/MM/YYYY)</h3>
+                <h3>Project End Date</h3>
                 <textarea id="projectEnd" required v-model="projectEnd"></textarea>
             </div> <br>
 
@@ -70,25 +70,23 @@
         </div>
     </div> <br>
 
-    <div class="launchProj">
-        <button @click="launchProject(), $router.push('Project')">Launch Project</button>
+    <div class="saveChanges">
+        <button @click="saveChanges(), $router.push('Project')">Save Change</button>
     </div>
 </template>
 
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, addDoc, collection, updateDoc, Timestamp, arrayUnion } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
 export default {
-    name: 'Cppp',
+    name: 'EditProjectProfile',
 
     data() {
         return {
-            pageBackgroundColor: '#FDF8F6',
             projectName: "",
             projectDescription: "",
             skillsRequired: "",
@@ -98,95 +96,52 @@ export default {
             projectHost: "",
             projectMembers: [],
             projectID: "",
+            projectImage: null,
+            projectThumbnailUrl: null,
+            projectBackground: "",
             projectStart: "",
             projectEnd: "",
-            projectImage: null,
-            projectImagePreview: null,
-            projectBackground: null,
-            projectBackgroundPreview: null,
-            pendingMembers: [],
-            projectCompleted: false
+            pendingMembers: []
         }
     },
 
     methods: {
-        setBodyBackGroundColor(color) {
-            //apply background color to the body of the webpage
-            document.body.style.backgroundColor = color;
+        async fetchProjectDetails() {
+            this.projectID = this.$route.params.id;
+            let docRef = doc(db, "Project Collection", this.projectID);
+            let docSnap = await getDoc(docRef);
+            let projectData = docSnap.data()
+            this.projectName = projectData.projectName;
+            this.projectDescription = projectData.projectDescription;
+            this.projectHost = projectData.projectHost;
+            this.projectMembers = projectData.projectMembers;
+            this.membersRequired = projectData.membersRequired;
+            this.signupDeadline = projectData.signupDeadline.toDate().toDateString();
+            this.skillsRequired = projectData.skillsRequired;
+            this.projectStart = projectData.projectStart.toDate().toDateString();
+            this.projectEnd = projectData.projectEnd.toDate().toDateString();
+            this.pendingMembers = projectData.pendingMembers;
+            this.findOutMore = projectData.Find_Out_More;
+            this.projectImage = projectData.projectImage;
+            this.projectBackground = projectData.projectBackground;
         },
 
-        isValidDate(dateStr) {
-            const regex = /^\d{2}\/\d{2}\/\d{4}$/; // Checks for the "DD/MM/YYYY" format
-            if (!dateStr.match(regex)) {
-                return false; // Returns false if date does not match the format
-            }
-
-            const [day, month, year] = dateStr.split("/").map(Number);
-            const date = new Date(year, month - 1, day); // Creates a Date object
-
-            const now = new Date(); // Current date for comparison
-            now.setHours(0, 0, 0, 0); // Normalize current date to avoid hour-minute-second comparison
-
-            // Check if it's a valid date and not in the past
-            if (date.getTime() < now.getTime() || date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
-                return false;
-            }
-
-            return true;
-        },
-
-        compareDates(start, end) {
-            const [startDay, startMonth, startYear] = start.split("/").map(Number);
-            const [endDay, endMonth, endYear] = end.split("/").map(Number);
-
-            const startDate = new Date(startYear, startMonth - 1, startDay);
-            const endDate = new Date(endYear, endMonth - 1, endDay);
-
-            return endDate > startDate; // True if end date is after start date
-        },
-
-        convertDateToTimestamp(dateStr) {
-            // Assuming dateStr is in "DD/MM/YYYY"
-            const parts = dateStr.split("/"); // Split the string into parts
-            const date = new Date(parts[2], parts[1] - 1, parts[0]); // Create a new Date object, note months are 0-indexed
-
-            return Timestamp.fromDate(date); // Convert the Date object to a Firestore Timestamp
-        },
-
-        async launchProject() {
+        async saveChanges() {
             console.log("IN LP")
-            alert(" Launching your project : " + projectName)
+            alert(" Saving changes to your project : " + projectName)
 
-            if (!this.isValidDate(this.projectStart) || !this.isValidDate(this.projectEnd) || !this.isValidDate(this.signupDeadline)) {
-                alert("One or more dates have invalid format or in the past.");
-                return;
-            }
-
-            if (!this.compareDates(this.projectStart, this.projectEnd)) {
-                alert("The project end date must be after the project start date.");
-                return;
-            }
-
-            if (!this.compareDates(this.signupDeadline, this.projectEnd)) {
-                alert("The signup deadline must be before the project end date.");
-                return;
-            }
             try {
-                const docRef = await addDoc(collection(db, "Project Collection"), {
+                const docRef = await updateDoc(doc(db, "Project Collection", this.projectID), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
-                    Find_Out_More: this.findOutMore, membersRequired: parseInt(this.membersRequired), projectStart: this.convertDateToTimestamp(this.projectStart),
-                    projectEnd: this.convertDateToTimestamp(this.projectEnd), signupDeadline: this.convertDateToTimestamp(this.signupDeadline), projectID: this.projectID, projectHost: this.projectHost,
-                    projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground, pendingMembers: this.pendingMembers, 
-                    projectCompleted: this.projectCompleted
+                    Find_Out_More: this.findOutMore, membersRequired: this.membersRequired, projectStart: this.projectStart,
+                    projectEnd: this.projectEnd, signupDeadline: this.signupDeadline, projectID: this.projectID, projectHost: this.projectHost,
+                    projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground,
+                    projectImage: this.projectImage, projectThumbnailUrl: this.projectThumbnailUrl
                 });
-                console.log(docRef.id)
-                let updateDocRef = doc(db, 'Project Collection', docRef.id);
-                await updateDoc(updateDocRef, {projectID: docRef.id});
-                let hostRef = doc(db, 'User Information', this.projectHost);
-                await updateDoc(hostRef, {hostedProjects: arrayUnion(docRef.id), currentProjects: arrayUnion(docRef.id)});
+                console.log(docRef)
             }
             catch (error) {
-                console.error("Error adding document: ", error);
+                console.error("Error saving document: ", error);
             }
         },
 
@@ -208,13 +163,23 @@ export default {
         async previewImage(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.projectImagePreview = e.target.result;
+                this.projectImage = e.target.result;
             };
 
             reader.onloadend = async () => {
-                const downloadURL = await this.uploadImage(file);
-                if (downloadURL) {
-                    this.projectImage = downloadURL;
+                // This should be called when the reader has finished reading the file
+                try {
+                    const downloadURL = await this.uploadImage(file);
+                    if (downloadURL) {
+                        this.projectThumbnailUrl = downloadURL;
+                        const docRef = doc(db, 'Project Collection', this.projectID);
+                        await setDoc(docRef, {
+                            projectImage: downloadURL, // Save the image URL in Firestore
+                        }, { merge: true });
+                        console.log("Firestore document updated with image URL");
+                    }
+                } catch (error) {
+                    console.error("Error updating Firestore document or uploading image: ", error);
                 }
             };
             reader.readAsDataURL(file); // Start reading the file
@@ -237,7 +202,6 @@ export default {
                 throw error;
             }
         },
-
 
         triggerFileUploadForBackground() {
             // Trigger the hidden file input when the button is clicked
@@ -288,14 +252,7 @@ export default {
     },
 
     mounted() {
-        this.setBodyBackGroundColor(this.pageBackgroundColor);
-
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                this.projectHost = user.uid;
-            }
-        });
+        this.fetchProjectDetails();
     }
 }
 </script>
@@ -321,6 +278,8 @@ h3 {
     height: 200px;
     width: 80%;
 }
+
+
 
 .thumbnail {
     display: flex;

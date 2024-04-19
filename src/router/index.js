@@ -10,6 +10,7 @@ import ManagePrj from '../components/ManagePrj.vue'
 import ReviewsPage from "../views/ReviewsPage.vue"
 import CreateProject from "../components/Cppp.vue"
 import RegisterForm from "../components/RegisterForm.vue"
+import EditProjectProfile from '@/views/EditProjectProfile.vue'
 
 
 const routes = [
@@ -70,7 +71,13 @@ const routes = [
         path: '/CreateProject',
         name: 'CreateProject',
         component: CreateProject
+    },
+    {
+        path: "/EditProjectProfile:id",
+        name: 'EditProjectProfile',
+        component: EditProjectProfile
     }
+  
 ]
 
 const router = createRouter({
