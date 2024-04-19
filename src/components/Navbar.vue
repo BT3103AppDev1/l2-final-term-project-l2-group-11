@@ -69,8 +69,8 @@
                 if (docSnap.exists()) {
                   this.profileImageUrl = docSnap.data().profileImageUrl || '';
                   console.log('User Data:', docSnap.data());
-                  console.log('Questionaire Filled:', docSnap.data().questionaireFilled);
-                  if (!docSnap.data().questionaireFilled) {
+                  console.log('Questionaire Filled:', docSnap.data().filledQuestionaire);
+                  if (!docSnap.data().filledQuestionaire) {
                     console.log('Redirecting to SignUpQuestionaire');
                     this.$router.push({ name: 'SignUpQuestionaire', params: { userId: user.uid } });
                   }
