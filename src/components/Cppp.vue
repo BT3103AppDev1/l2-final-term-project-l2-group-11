@@ -170,7 +170,7 @@ export default {
                     pendingMembers: this.pendingMembers,
                     projectCompleted: this.projectCompleted
                 });
-                console.log(docRef.id)
+
                 let updateDocRef = doc(db, 'Project Collection', docRef.id);
                 await updateDoc(updateDocRef, { projectID: docRef.id });
                 let hostRef = doc(db, 'User Information', this.projectHost);
