@@ -50,17 +50,17 @@
 
             <div class="signUpDeadline">
                 <h3>Sign Up Deadline</h3>
-                <textarea id="signUpDeadline" required v-model="signupDeadline"></textarea>
+                <input type="date" id="signUpDeadline" required v-model.lazy="signupDeadline">
             </div> <br>
 
             <div class="projectStart">
                 <h3>Project Start Date</h3>
-                <textarea id="projectStart" required v-model="projectStart"></textarea>
+                <input type="date" id="projectStart" required v-model.lazy="projectStart">
             </div> <br>
 
             <div class="projectEnd">
                 <h3>Project End Date</h3>
-                <textarea id="projectEnd" required v-model="projectEnd"></textarea>
+                <input type="date" id="projectEnd" required v-model.lazy="projectEnd">
             </div> <br>
 
             <div class="findOutMore">
@@ -71,7 +71,9 @@
     </div> <br>
 
     <div class="saveChanges">
-        <button @click="saveChanges(), $router.push('Project')">Save Change</button>
+        <button @click="saveChanges(), $router.push('Project')"
+            :disabled="projectEnd === null || projectStart === null || signupDeadline === null || skillsRequired == '' || membersRequired == '' || projectDescription == '' || projectName == ''">Save
+            Change</button>
     </div>
 </template>
 
@@ -91,7 +93,7 @@ export default {
             projectDescription: "",
             skillsRequired: "",
             membersRequired: "",
-            signupDeadline: "",
+            signupDeadline: null,
             findOutMore: "",
             projectHost: "",
             projectMembers: [],
@@ -99,8 +101,8 @@ export default {
             projectImage: null,
             projectThumbnailUrl: null,
             projectBackground: "",
-            projectStart: "",
-            projectEnd: "",
+            projectStart: null,
+            projectEnd: null,
             pendingMembers: []
         }
     },
@@ -116,29 +118,78 @@ export default {
             this.projectHost = projectData.projectHost;
             this.projectMembers = projectData.projectMembers;
             this.membersRequired = projectData.membersRequired;
-            this.signupDeadline = projectData.signupDeadline.toDate().toDateString();
             this.skillsRequired = projectData.skillsRequired;
-            this.projectStart = projectData.projectStart.toDate().toDateString();
-            this.projectEnd = projectData.projectEnd.toDate().toDateString();
             this.pendingMembers = projectData.pendingMembers;
             this.findOutMore = projectData.Find_Out_More;
             this.projectImage = projectData.projectImage;
             this.projectBackground = projectData.projectBackground;
         },
 
+        convertDateToTimestamp(dateStr) {
+            // Assuming dateStr is in "YYYY-MM-DD"
+            const parts = dateStr.split("-"); // Split the string into parts
+            const date = new Date(parts[0], parts[1] - 1, parts[2]); // Create a new Date object, note months are 0-indexed
+
+            return Timestamp.fromDate(date); // Convert the Date object to a Firestore Timestamp
+        },
+
+
+        // isValidDate(dateStr) {
+        //     const regex = /^\d{2}\/\d{2}\/\d{4}$/; // Checks for the "DD/MM/YYYY" format
+        //     if (!dateStr.match(regex)) {
+        //         return false; // Returns false if date does not match the format
+        //     }
+
+        //     const [day, month, year] = dateStr.split("/").map(Number);
+        //     const date = new Date(year, month - 1, day); // Creates a Date object
+
+        //     const now = new Date(); // Current date for comparison
+        //     now.setHours(0, 0, 0, 0); // Normalize current date to avoid hour-minute-second comparison
+
+        //     // Check if it's a valid date and not in the past
+        //     if (date.getTime() < now.getTime() || date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
+        //         return false;
+        //     }
+
+        //     return true;
+        // },
+
+        // compareDates(start, end) {
+        //     const [startDay, startMonth, startYear] = start.split("/").map(Number);
+        //     const [endDay, endMonth, endYear] = end.split("/").map(Number);
+
+        //     const startDate = new Date(startYear, startMonth - 1, startDay);
+        //     const endDate = new Date(endYear, endMonth - 1, endDay);
+
+        //     return endDate > startDate; // True if end date is after start date
+        // },
+
         async saveChanges() {
             console.log("IN LP")
             alert(" Saving changes to your project : " + projectName)
 
+            if (!this.isValidDate(this.projectStart) || !this.isValidDate(this.projectEnd) || !this.isValidDate(this.signupDeadline)) {
+                alert("One or more dates have invalid format or in the past.");
+                return;
+            }
+
+            if (!this.compareDates(this.projectStart, this.projectEnd)) {
+                alert("The project end date must be after the project start date.");
+                return;
+            }
+
+            if (!this.compareDates(this.signupDeadline, this.projectEnd)) {
+                alert("The signup deadline must be before the project end date.");
+                return;
+            }
             try {
                 const docRef = await updateDoc(doc(db, "Project Collection", this.projectID), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
-                    Find_Out_More: this.findOutMore, membersRequired: this.membersRequired, projectStart: this.projectStart,
-                    projectEnd: this.projectEnd, signupDeadline: this.signupDeadline, projectID: this.projectID, projectHost: this.projectHost,
+                    Find_Out_More: this.findOutMore, membersRequired: parseInt(this.membersRequired), projectStart: this.convertDateToTimestamp(this.projectStart),
+                    projectEnd: this.convertDateToTimestamp(this.projectEnd), signupDeadline: this.convertDateToTimestamp(this.signupDeadline), projectID: this.projectID, projectHost: this.projectHost,
                     projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground,
                     projectImage: this.projectImage, projectThumbnailUrl: this.projectThumbnailUrl
                 });
-                console.log(docRef)
             }
             catch (error) {
                 console.error("Error saving document: ", error);
@@ -279,8 +330,6 @@ h3 {
     width: 80%;
 }
 
-
-
 .thumbnail {
     display: flex;
     gap: 30px;
@@ -311,6 +360,10 @@ h3 {
 
 #description {
     height: 400px;
+}
+
+input {
+    font-size: 35px;
 }
 
 button {
@@ -352,8 +405,12 @@ textarea {
     background-color: rgb(212, 211, 211);
 }
 
-.launchProj {
+.saveChanges {
     display: flex;
     justify-content: center;
+}
+
+.saveChanges button:disabled {
+    background-color: gray;
 }
 </style>
