@@ -1,3 +1,4 @@
+
 <template>
     <div class="heading">
         <img src="../assets/CpppImage.png" alt="error" class="center-image"><br><br>
@@ -138,8 +139,6 @@ export default {
                     currentProjects: arrayRemove(this.projectID)
                 })
             ]);
-
-
             alert("Member Removed");
 
             // reload the page
@@ -174,7 +173,8 @@ export default {
                     projectMembers: arrayUnion(memberId)
                 }),
                 updateDoc(userRef, {
-                    currentProjects: arrayUnion(this.projectID)
+                    currentProjects: arrayUnion(this.projectID),
+                    pendingProjects: arrayRemove(this.projectID)
                 })
             ]);
 
@@ -194,7 +194,15 @@ export default {
             await updateDoc(projectRef, {
                 projectCompleted: true
             });
-
+            let hostID = this.projectData.projectHost;
+            const hostRef = doc(db, 'User Information', hostID);
+            await updateDoc(hostRef, {currentProjects: arrayRemove(this.projectData.projectID)});
+            await updateDoc(hostRef, {pastProjects: arrayUnion(this.project.projectID)});
+            this.projectData.projectMembers.forEach(async (memberID) => {
+                let memberRef = doc(db, 'User Information', memberID);
+                await updateDoc(memberRef, {currentProjects: arrayRemove(this.project.projectID)});
+                await updateDoc(memberRef, {pastProjects: arrayUnion(this.project.projectID)});
+            })
             alert("Project Completed");
 
             router.push('/project');
@@ -349,4 +357,3 @@ img {
     border: 1px solid black;
 }
 </style>
-
