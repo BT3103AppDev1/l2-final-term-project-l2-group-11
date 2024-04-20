@@ -15,15 +15,15 @@
                 </div>
 
                 <div class="card-footer">
-                    <div v-if = "this.projectCompleted" class="footer-section time">
+                    <div v-if="this.projectCompleted" class="footer-section time">
                         <span>Project Completed</span>
                     </div>
                     <div v-else class="footer-section time">
                         <span>{{ this.numDays }} days to go</span>
                     </div>
-                    <div class = "bookmark-icon">
-                        <img @click.stop = "toggleBookmark" v-if = "this.bookmarked" src = "../assets/bookmark.png"/>
-                        <img @click.stop = "toggleBookmark" v-else src = "../assets/bookmark-white.png"/>
+                    <div class="bookmark-icon">
+                        <img @click.stop="toggleBookmark" v-if="this.bookmarked" src="../assets/bookmark.png" />
+                        <img @click.stop="toggleBookmark" v-else src="../assets/bookmark-white.png" />
                     </div>
                 </div>
             </div>
@@ -90,6 +90,7 @@ export default {
                 this.savedProjects = this.userProfile.savedProjects;
                 this.bookmarked = this.savedProjects.includes(this.project.id);
                 this.numDays = Math.round((this.project.projectEnd.toDate().getTime() - new Date().getTime())/(1000 * 3600 * 24));
+                this.projectCompleted = this.project.projectCompleted;
             } else {
                 this.userstate = false; // User is not logged in
                 this.uid = '';
@@ -97,10 +98,10 @@ export default {
                 this.savedProjects = [];
             }
         })
-        if (this.project.projectEnd.toDate().getTime() < new Date().getTime()) {
+        if (this.project.projectEnd.toDate().getTime() < new Date().getTime() || this.project.projectCompleted == true) {
             const docRef = doc(db, 'Project Collection', this.project.id);
             await updateDoc(docRef, {projectCompleted: true});
-            this.projectCompleted = true;
+            this.project.projectCompleted = true;
             let hostID = this.project.projectHost;
             const hostRef = doc(db, 'User Information', hostID);
             await updateDoc(hostRef, {currentProjects: arrayRemove(this.project.projectID)});
