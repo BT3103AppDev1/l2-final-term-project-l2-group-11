@@ -1,70 +1,74 @@
 <template>
-    <div class = "proj-profile-wrapper">
-    <div class="heading">
-        <img src="../assets/CpppImage.png" alt="error" class="center-image">
+    <div class="proj-profile-wrapper">
+        <div class="heading">
+            <img src="../assets/CpppImage.png" alt="error" class="center-image">
 
-        <div class="titleDetail">
-            <div class="title">
-                <h1 id="projTitle">{{ projectName }}</h1>
+            <div class="titleDetail">
+                <div class="title">
+                    <h1 id="projTitle">{{ projectName }}</h1>
+                    <div v-if="projectCompleted" class="completed">Project Completed</div>
+                    <div v-else>
+                        <div v-if="this.uid == (projectMembers.length > 0 ? projectMembers[0].userId : '')"
+                            class="buttonsForHost">
+                            <button id="button1"
+                                @click="$router.push({ name: 'EditProjectProfile', params: { id: this.projectID } })">
+                                Edit Project Detail</button>
+                            <button id="button2" @click="manageProject">Manage Project</button>
+                        </div>
 
-                <div v-if="this.uid == (projectMembers.length > 0 ? projectMembers[0].userId : '')" class="buttonsForHost">
-                    <button id="button1"
-                        @click="$router.push({ name: 'EditProjectProfile', params: { id: this.projectID } })">
-                        Edit Project Detail</button>
-                    <button id="button2" @click="manageProject">Manage Project</button>
-                </div>
+                        <div v-else-if="this.pendingMembers.includes(this.uid)" class="buttonForPendingApplication">
+                            <button id="button1" @click="withdrawApplication">Withdraw Application</button>
+                        </div>
 
-                <div v-else-if="this.pendingMembers.includes(this.uid)" class="buttonForPendingApplication">
-                    <button id="button1" @click="withdrawApplication">Withdraw Application</button>
-                </div>
+                        <div v-else-if="this.projectMemberId.includes(this.uid)" class="buttonsForMember">
+                            <button id="button1" @click="leaveProject">Leave Project</button>
+                        </div>
 
-                <div v-else-if="this.projectMemberId.includes(this.uid)" class="buttonsForMember">
-                    <button id="button1" @click="leaveProject">Leave Project</button>
-                </div>
-
-                <div v-else class="buttonsForOther">
-                    <button id="button1" @click="applyForProject">Apply For Project</button>
-                    <button id="button2">Save Project</button>
-                </div>
-            </div>
-
-            <div class="adminDetails">
-                <div v-show = "projectMembers.length > 0" class = host-details>
-                    <h4>Project Host:</h4>
-                    <img v-bind:src = "projectMembers.length > 0 ? projectMembers[0].profileImageUrl : ''" v-on:click="visitProfilePage(projectMembers[0].userId)" />
-                </div>
-                <div v-show = "projectMembers.length > 0" class = members-details>
-                    <h4>Project Members: {{ projectMembers.length > 1 ? "" : "No member yet!" }}</h4>
-                    <div v-for = "member in projectMembers.slice(1)" class = "members-container">
-                        <img v-bind:src = member.profileImageUrl v-on:click="visitProfilePage(member.userId)"/>
+                        <div v-else class="buttonsForOther">
+                            <button id="button1" @click="applyForProject">Apply For Project</button>
+                            <button id="button2">Save Project</button>
+                        </div>
                     </div>
                 </div>
-                <h4>Members Required: {{ membersRequired }}</h4>
-                <h4>Sign-up Deadline: {{ signupDeadline }}</h4>
+
+                <div class="adminDetails">
+                    <div v-show="projectMembers.length > 0" class=host-details>
+                        <h4>Project Host:</h4>
+                        <img v-bind:src="projectMembers.length > 0 ? projectMembers[0].profileImageUrl : ''"
+                            v-on:click="visitProfilePage(projectMembers[0].userId)" />
+                    </div>
+                    <div v-show="projectMembers.length > 0" class=members-details>
+                        <h4>Project Members: {{ projectMembers.length > 1 ? "" : "No member yet!" }}</h4>
+                        <div v-for="member in projectMembers.slice(1)" class="members-container">
+                            <img v-bind:src=member.profileImageUrl v-on:click="visitProfilePage(member.userId)" />
+                        </div>
+                    </div>
+                    <h4>Members Required: {{ membersRequired }}</h4>
+                    <h4>Sign-up Deadline: {{ signupDeadline }}</h4>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="detail">
-        <div class="description">
-            <p>{{ projectDescription }}</p>
-        </div>
-
-        <div class="skillsRequired">
-            <h2>Skills Required</h2>
-            <div class="tags-container">
-                <span class="tags" v-for="skill in skillsRequired" :key="skills">{{ skill }}</span>
+        <div class="detail">
+            <div class="description">
+                <p>{{ projectDescription }}</p>
             </div>
-        </div>
 
-        <div class="commitment">
-            <h2>Project Commitment</h2>
-            <span id="timeline">{{ projectStart }} to {{ projectEnd }}</span>
-        </div>
+            <div class="skillsRequired">
+                <h2>Skills Required</h2>
+                <div class="tags-container">
+                    <span class="tags" v-for="skill in skillsRequired" :key="skills">{{ skill }}</span>
+                </div>
+            </div>
 
-        <a id="findOutMore">Find Out More</a>
+            <div class="commitment">
+                <h2>Project Commitment</h2>
+                <span id="timeline">{{ projectStart }} to {{ projectEnd }}</span>
+            </div>
+
+            <a id="findOutMore">Find Out More</a>
+        </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -93,6 +97,7 @@ export default {
             uid: "",
             pendingMembers: [],
             projectMemberId: [],
+            projectCompleted: false,
         }
     },
 
@@ -106,6 +111,7 @@ export default {
             this.projectName = projectData.projectName;
             this.projectDescription = projectData.projectDescription;
             this.projectMemberId = projectData.projectMembers;
+            this.projectCompleted = projectData.projectCompleted;
 
             let hostDetail = {}
             let hostDetails = await getDoc(doc(db, "User Information", "" + projectData.projectHost));
@@ -163,8 +169,8 @@ export default {
         async withdrawApplication() {
             // Remove the user from the pending members list
             this.pendingMembers = this.pendingMembers.filter(member => member !== this.uid);
-        
-        
+
+
             // Update the project document
             const docRef = doc(db, "Project Collection", this.projectID)
             await updateDoc(docRef, {
@@ -193,19 +199,20 @@ export default {
 <style scoped>
 .proj-profile-wrapper {
     height: 100%;
-    width:100%;
+    width: 100%;
     background-color: white;
-    display:flex;
+    display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     overflow: scroll;
 }
+
 .heading {
     height: 55%;
-    width:100%;
+    width: 100%;
     background-color: #ffece4;
-    display:flex;
+    display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
@@ -219,22 +226,22 @@ export default {
 
 .titleDetail {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding:0 10%;
-    height:60%;
-    width:100%;
+    padding: 0 10%;
+    height: 60%;
+    width: 100%;
 }
 
 .titleDetail .title {
-    height:100%;
-    width:70%;
+    height: 100%;
+    width: 70%;
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
     justify-content: center;
     align-items: left;
-    
+
 }
 
 #projTitle {
@@ -244,51 +251,52 @@ export default {
 }
 
 .adminDetails {
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: right;
-   font-size:15px;
-   font-weight: 1000;
-   height:100%;
-   width:30%;
-   gap:15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: right;
+    font-size: 15px;
+    font-weight: 1000;
+    height: 100%;
+    width: 30%;
+    gap: 15px;
 }
 
 .adminDetails h4 {
-    font-size:17px;
+    font-size: 17px;
     font-weight: 700;
     text-align: left;
 }
 
-.adminDetails > h4 {
+.adminDetails>h4 {
     height: 40px;
 }
 
 .host-details {
     display: flex;
-   flex-direction: row;
-   justify-content: flex-start;
-   align-items: center;
-   gap:10px;
-   height:40px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
 }
 
-.host-details img, .members-container img  {
-    height:40px;
-    width:40px;
-    object-fit:cover;
+.host-details img,
+.members-container img {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
     border-radius: 50%;
-    border:1px solid black;
+    border: 1px solid black;
 }
 
 .members-details {
     display: flex;
-   flex-direction: row;
-   justify-content: flex-start;
-   align-items: center;
-   gap:10px;
-   height:40px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
 }
 
 .members-container {
@@ -296,8 +304,8 @@ export default {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    gap:5px;
-    height:40px;
+    gap: 5px;
+    height: 40px;
     overflow: scroll;
 }
 
@@ -346,60 +354,73 @@ button:active {
     flex-direction: column;
     justify-content: flex-start;
     align-items: left;
-    padding:0 10%;
-    gap:30px;
+    padding: 0 10%;
+    gap: 30px;
     width: 100%;
 }
 
 .detail .description p {
-    font-size:20px;
+    font-size: 20px;
     text-align: left;
 }
 
 
-.detail .skillsRequired h2,  .detail .commitment h2{
+.detail .skillsRequired h2,
+.detail .commitment h2 {
     font-size: 25px;
     font-weight: bold;
     text-align: left;
 }
 
 #findOutMore {
-    color:rgb(255, 157, 0);
+    color: rgb(255, 157, 0);
     font-size: 20px;
     font-weight: bold;
     background-color: transparent;
     transition: font-size 700ms;
-    margin-bottom: 30px;;
+    margin-bottom: 30px;
+    ;
 }
 
 #findOutMore:hover {
     font-size: 23px;
     background-color: transparent;
-    
+
 }
 
 .tags-container {
-    height:50px;
-    width:100%;
-    display:flex;
-    flex-direction:row;
-    align-items:center;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
     overflow: scroll;
 }
 
 .tags {
-    height:30px;
+    height: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: 15px;
-    color:black;
+    color: black;
     background-color: rgb(181, 174, 174);
     padding: 0px 10px;
     margin-right: 10px;
 }
 
-
+.completed {
+    justify-content: center;
+    border-radius: 4px;
+    background-color: #263238;
+    align-self: start;
+    margin-top: 26px;
+    color: #fff;
+    text-align: center;
+    padding: 14px 32px;
+    font: 20px/120% Inter, sans-serif;
+    border: none;
+}
 </style>
