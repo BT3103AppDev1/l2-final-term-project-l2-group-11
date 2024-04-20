@@ -73,6 +73,7 @@ export default {
 
     data() {
         return {
+            projectData: null,
             projectName: "",
             projectID: "",
             projectMembers: [],
@@ -100,6 +101,7 @@ export default {
             let docRef = doc(db, "Project Collection", this.projectID);
             let docSnap = await getDoc(docRef);
             let projectData = docSnap.data();
+            this.projectData = projectData;
             this.projectName = projectData.projectName;
             this.currentID = projectData.projectMembers;
             this.pendingID = projectData.pendingMembers;
@@ -194,14 +196,15 @@ export default {
             await updateDoc(projectRef, {
                 projectCompleted: true
             });
+            console.log(this.projectData);
             let hostID = this.projectData.projectHost;
             const hostRef = doc(db, 'User Information', hostID);
-            await updateDoc(hostRef, {currentProjects: arrayRemove(this.projectData.projectID)});
-            await updateDoc(hostRef, {pastProjects: arrayUnion(this.project.projectID)});
+            await updateDoc(hostRef, {currentProjects: arrayRemove(this.projectID)});
+            await updateDoc(hostRef, {pastProjects: arrayUnion(this.projectID)});
             this.projectData.projectMembers.forEach(async (memberID) => {
                 let memberRef = doc(db, 'User Information', memberID);
-                await updateDoc(memberRef, {currentProjects: arrayRemove(this.project.projectID)});
-                await updateDoc(memberRef, {pastProjects: arrayUnion(this.project.projectID)});
+                await updateDoc(memberRef, {currentProjects: arrayRemove(this.projectID)});
+                await updateDoc(memberRef, {pastProjects: arrayUnion(this.projectID)});
             })
             alert("Project Completed");
 
