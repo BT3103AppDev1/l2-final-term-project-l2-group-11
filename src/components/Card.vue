@@ -96,6 +96,8 @@ export default {
                 this.uid = '';
                 this.userProfile = null;
                 this.savedProjects = [];
+                this.projectCompleted = this.project.projectCompleted;
+                this.numDays = Math.round((this.project.projectEnd.toDate().getTime() - new Date().getTime())/(1000 * 3600 * 24));
             }
         })
         if (this.project.projectEnd.toDate().getTime() < new Date().getTime() || this.project.projectCompleted == true) {
