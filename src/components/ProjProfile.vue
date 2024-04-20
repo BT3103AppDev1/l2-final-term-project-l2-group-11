@@ -26,7 +26,6 @@
 
                         <div v-else class="buttonsForOther">
                             <button id="button1" @click="applyForProject">Apply For Project</button>
-                            <button id="button2">Save Project</button>
                         </div>
                     </div>
                 </div>
@@ -74,7 +73,7 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { getDoc, doc, updateDoc, arrayUnion, arrayRemove  } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
@@ -151,6 +150,8 @@ export default {
             await updateDoc(docRef, {
                 pendingMembers: this.pendingMembers
             });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, {pendingProjects: arrayUnion(this.projectID)});
             alert("Applied for project");
         },
 
@@ -163,6 +164,8 @@ export default {
             await updateDoc(docRef, {
                 projectMembers: this.projectMemberId,
             });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, {currentProjects: arrayRemove(this.projectID)});
             alert("Left project");
         },
 
@@ -176,6 +179,9 @@ export default {
             await updateDoc(docRef, {
                 pendingMembers: this.pendingMembers,
             });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, {pendingProjects: arrayRemove(this.projectID)});
+
             alert("Withdrawn application");
         },
 
