@@ -24,9 +24,9 @@
             <div class="member-item" v-for="member in projectMembers">
                 <div class="member-info">
                     <div class="member-avatar">
-                        <img v-bind:src = member.profileImageUrl>
+                        <img v-bind:src=member.profileImageUrl>
                     </div>
-                    <div class="member-name" v-on:click="visitProfilePage(member.userId)">{{ member.name }}</div>
+                    <div class="member-name" v-on:click="visitProfilePage(member.userID)">{{ member.name }}</div>
                 </div>
                 <div class="pos-button"><button class="remove-btn" @click="removeMember(member.userID)">Remove</button>
                 </div>
@@ -37,9 +37,9 @@
             <div class="member-item" v-for="member in pendingMembers">
                 <div class="member-info">
                     <div class="member-avatar">
-                        <img v-bind:src = member.profileImageUrl>
+                        <img v-bind:src=member.profileImageUrl>
                     </div>
-                    <div class="member-name" v-on:click="visitProfilePage(member.userId)" >{{ member.name }}</div>
+                    <div class="member-name" v-on:click="visitProfilePage(member.userID)">{{ member.name }}</div>
                 </div>
                 <div class="pos-button">
                     <button class="reject-btn" @click="rejectMember(member.userID)">Reject</button>
@@ -77,6 +77,7 @@ export default {
             projectMembers: [],
             pendingMembers: [],
             isCurrentMembersActive: true,
+            uid: "",
         };
     },
 
@@ -127,9 +128,7 @@ export default {
 
         async removeMember(memberId) {
             const projectRef = doc(db, "Project Collection", this.projectID);
-            const userRef = doc(db, "User Information", memberId); // cannot update the user's currentProjects field, after remove 
-
-            this.projectMembers = this.pendingMembers.filter(member => member.userID !== memberId);
+            const userRef = doc(db, "User Information", memberId); 
 
             await Promise.all([
                 updateDoc(projectRef, {
@@ -139,24 +138,27 @@ export default {
                     currentProjects: arrayRemove(this.projectID)
                 })
             ]);
-            
+
 
             alert("Member Removed");
 
             // reload the page
             window.location.reload();
-
-            // Update UI without page reload
         },
 
         async rejectMember(memberId) {
             const projectRef = doc(db, "Project Collection", this.projectID);
+            const userRef = doc(db, "User Information", memberId);
 
-            await updateDoc(projectRef, {
-                pendingMembers: arrayRemove(memberId)
-            });
+            await Promise.all([
+                updateDoc(projectRef, {
+                    pendingMembers: arrayRemove(memberId)
+                }),
+                updateDoc(userRef, {
+                    pendingProjects: arrayRemove(this.projectID)
+                })
+            ]);
 
-            this.pendingMembers = this.pendingMembers.filter(member => member.userID !== memberId);
             alert("Member Rejected");
 
             window.location.reload();
@@ -176,11 +178,9 @@ export default {
                 })
             ]);
 
-            this.pendingMembers = this.pendingMembers.filter(member => member.userID !== memberId);
             alert("Member Accepted");
-            
+
             window.location.reload();
-            // Update UI without page reload
         },
 
         async deleteProject() {
@@ -194,18 +194,6 @@ export default {
             await updateDoc(projectRef, {
                 projectCompleted: true
             });
-
-            const userRef = doc(db, "User Information", uid);
-            const userDocSnap = await getDoc(userRef);
-            if (userDocSnap.exists()) {
-                await updateDoc(userRef, {
-                    pastProjects: arrayUnion({ id: this.projectID })
-                });
-            } else {
-                await setDoc(userRef, {
-                    pastProjects: [{ id: this.projectID }]
-                });
-            }
 
             alert("Project Completed");
 
@@ -354,11 +342,11 @@ img {
 }
 
 .member-avatar img {
-    height:40px;
-    width:40px;
-    object-fit:cover;
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
     border-radius: 50%;
-    border:1px solid black;
+    border: 1px solid black;
 }
 </style>
 
