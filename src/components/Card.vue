@@ -2,6 +2,9 @@
 <template>
     
     <div v-if = "userstate" class="card" @click="goToProjProfile">
+        <div v-if="showNotifications && pendingMembersCount" class="notification-badge">
+            {{ pendingMembersCount }}
+        </div>
         <div class="card-image">
             <img v-bind:src="imageUrl" alt="Very cool picture">
         </div>  
@@ -120,8 +123,14 @@ async mounted() {
 
 props: {
     project: Object,
-    imageUrl: String
+    imageUrl: String,
+    pendingMembersCount: Number, // The count of pending members
+    showNotifications: {
+        type:Boolean,
+        default: false
+    }
 },
+
 methods : {
     async toggleBookmark() {
         this.bookmarked = !this.bookmarked;
@@ -236,5 +245,28 @@ height:20px;
 width:27px;
 padding-right:10px;
 cursor: pointer;
+}
+
+.card {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 20px; 
+  right: 14px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 0.75rem;
+  z-index: 100; /* Ensure the badge is above the card */
+  /* Set width and height for a perfect circle */
+  width: 25px; /* Adjust as needed */
+  height: 25px; /* Adjust as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(50%, -50%); /* This will center the badge over the corner */
 }
 </style>
