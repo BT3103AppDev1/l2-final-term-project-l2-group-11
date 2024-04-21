@@ -260,6 +260,7 @@ cursor: pointer;
   border-radius: 50%;
   padding: 5px;
   font-size: 0.75rem;
+  font-weight: bold;
   z-index: 100; /* Ensure the badge is above the card */
   /* Set width and height for a perfect circle */
   width: 25px; /* Adjust as needed */
