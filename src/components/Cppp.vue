@@ -39,7 +39,7 @@
             </div> <br>
 
             <div class="skill">
-                <h3>Skills (Add a comma between each skill)</h3>
+                <h3>Skills</h3>
                 <textarea id="skill" required v-model="skillsRequired"></textarea>
             </div> <br>
 
@@ -50,17 +50,17 @@
 
             <div class="signUpDeadline">
                 <h3>Sign Up Deadline</h3>
-                <input type="date" id="signUpDeadline" required v-model="signupDeadline">
+                <input type="date" id="signUpDeadline" required v-model.lazy="signupDeadline">
             </div> <br>
 
             <div class="projectStart">
                 <h3>Project Start Date</h3>
-                <input type="date" id="projectStart" required v-model="projectStart">
+                <input type="date" id="projectStart" required v-model.lazy="projectStart">
             </div> <br>
 
             <div class="projectEnd">
                 <h3>Project End Date</h3>
-                <input type="date" id="projectEnd" required v-model="projectEnd">
+                <input type="date" id="projectEnd" required v-model.lazy="projectEnd">
             </div> <br>
 
             <div class="findOutMore">
@@ -71,7 +71,9 @@
     </div> <br>
 
     <div class="launchProj">
-        <button @click="launchProject(), $router.push('Project')" :disabled="skillsRequired=='' || membersRequired=='' || projectDescription=='' || projectName==''">Launch Project</button>
+        <button @click="launchProject(), $router.push('Project')"
+            :disabled="projectEnd === null || projectStart === null || signupDeadline === null || skillsRequired == '' || membersRequired == '' || projectDescription == '' || projectName == ''">Launch
+            Project</button>
     </div>
 </template>
 
@@ -88,18 +90,20 @@ export default {
 
     data() {
         return {
+            defaultThumbnail: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppThumbnail.png?alt=media&token=d0384134-d797-4e93-a83c-4e21d957909b',
+            defaultBackground: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppImage.png?alt=media&token=1a7b60af-7c62-4b51-bfe0-fdd282569967',
             pageBackgroundColor: '#FDF8F6',
             projectName: "",
             projectDescription: "",
             skillsRequired: "",
             membersRequired: "",
-            signupDeadline: "",
+            signupDeadline: null,
             findOutMore: "",
             projectHost: "",
             projectMembers: [],
             projectID: "",
-            projectStart: "",
-            projectEnd: "",
+            projectStart: null,
+            projectEnd: null,
             projectImage: null,
             projectImagePreview: null,
             projectBackground: null,
@@ -154,21 +158,22 @@ export default {
         },
 
         async launchProject() {
-            alert("Launching your project");
+            console.log("IN LP")
+            alert(" Launching your project : " + projectName)
 
             try {
                 const docRef = await addDoc(collection(db, "Project Collection"), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
                     Find_Out_More: this.findOutMore, membersRequired: parseInt(this.membersRequired), projectStart: this.convertDateToTimestamp(this.projectStart),
                     projectEnd: this.convertDateToTimestamp(this.projectEnd), signupDeadline: this.convertDateToTimestamp(this.signupDeadline), projectID: this.projectID, projectHost: this.projectHost,
-                    projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground, pendingMembers: this.pendingMembers, 
+                    projectMembers: this.projectMembers, projectImage: this.projectImage != null ? this.projectImage : this.defaultThumbnail, projectBackground: this.projectBackground != null ? this.projectBackground : this.defaultBackground,
+                    pendingMembers: this.pendingMembers,
                     projectCompleted: this.projectCompleted
                 });
-                console.log(docRef.id)
                 let updateDocRef = doc(db, 'Project Collection', docRef.id);
-                await updateDoc(updateDocRef, {projectID: docRef.id});
+                await updateDoc(updateDocRef, { projectID: docRef.id });
                 let hostRef = doc(db, 'User Information', this.projectHost);
-                await updateDoc(hostRef, {hostedProjects: arrayUnion(docRef.id), currentProjects: arrayUnion(docRef.id)});
+                await updateDoc(hostRef, { hostedProjects: arrayUnion(docRef.id), currentProjects: arrayUnion(docRef.id) });
             }
             catch (error) {
                 console.error("Error adding document: ", error);
@@ -329,6 +334,10 @@ h3 {
     margin-left: 10%;
     margin-right: 5%;
     gap: 5%;
+}
+
+input {
+    font-size: 35px;
 }
 
 .right-side {
