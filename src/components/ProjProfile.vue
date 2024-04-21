@@ -294,6 +294,7 @@ export default {
     object-fit: cover;
     border-radius: 50%;
     border: 1px solid black;
+    cursor: pointer;
 }
 
 .members-details {
@@ -365,6 +366,7 @@ button:active {
 }
 
 .detail .description p {
+    margin-top: 10px;
     font-size: 20px;
     text-align: left;
 }
