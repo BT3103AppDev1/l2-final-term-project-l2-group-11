@@ -312,7 +312,6 @@ export default {
     align-items: center;
     gap: 5px;
     height: 40px;
-    overflow: scroll;
 }
 
 
@@ -401,7 +400,6 @@ button:active {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    overflow: scroll;
 }
 
 .tags {
