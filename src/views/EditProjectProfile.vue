@@ -1,4 +1,3 @@
-
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
     <div class="background">
@@ -81,7 +80,7 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, getDoc, setDoc, updateDoc,Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
