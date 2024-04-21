@@ -271,7 +271,7 @@ export default {
                     :project="project"
                     :image-url="project.projectImage"
                     :pendingMembersCount="project.pendingMembersCount"
-                    :show-notifications="true"
+                    :show-notifications="uid === userId"
 
                 />
             </div>
