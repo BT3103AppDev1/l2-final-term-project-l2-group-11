@@ -43,10 +43,11 @@ export default {
         const listOfProjects = await getDocs(collection(db, "Project Collection"))
         listOfProjects.forEach((doc) => {
           let project = doc.data();
-          project.id = doc.id;
-          this.projects.push(project);
+          if (!project.projectCompleted) {
+            project.id = doc.id;
+            this.projects.push(project);
+          }
         });
-        this.filteredProjects = this.projects;
       } catch (error) {
         console.error("Error fetching projects: ", error);
       }
@@ -94,22 +95,11 @@ export default {
 }
 
 .view {
-  color: #F5793B;
-  font-size: 22px;
-  font-weight: 600;
-  background-color: white;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 550px;
+  cursor: pointer;
   padding-left: 15px;
   padding-top: 100px;
-  font-size: Garamond, serif;
 }
-
-.view:hover{
-  background-color: white;
-  font-size: 26px;
-}
-
-.view {
-    transition: font-size 700ms;
-}
-
 </style>
