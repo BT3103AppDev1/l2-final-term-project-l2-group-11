@@ -65,18 +65,21 @@ export default {
         },
 
         convertIdToProjects(idList) {
-            let newProjectList = []
-            for (let i = 0; i<idList.length; i++) {
-                let docRef = doc(db, 'Project Collection', idList[i]);
-                let docSnap = getDoc(docRef);
-                docSnap.then(function (value) {
-                    let project = value.data();
-                    project.id = value.id;
-                    newProjectList.push(project);
-                })
-            };
+            let newProjectList = [];
+            for (let i = 0; i < idList.length; i++) {
+            let docRef = doc(db, 'Project Collection', idList[i]);
+            getDoc(docRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                let project = docSnap.data();
+                project.id = docSnap.id;
+                // Assuming pendingMembers is an array of user IDs
+                project.pendingMembersCount = project.pendingMembers ? project.pendingMembers.length : 0;
+                newProjectList.push(project);
+                }
+            });
+            }
             return newProjectList;
-        }, 
+        },
 
         //method to trigger file input
         triggerEditProfileUpload() {
@@ -261,7 +264,16 @@ export default {
 
         <div class = "project-container-wrapper">
             <div v-show="activeTab === 'my-projects'" class="project-container">
-                <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
+                <!-- <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/> -->
+                <Card
+                    v-for="project in hostedProjects"
+                    :key="project.id"
+                    :project="project"
+                    :image-url="project.projectImage"
+                    :pendingMembersCount="project.pendingMembersCount"
+                    :show-notifications="true"
+
+                />
             </div>
             <div v-show="activeTab === 'current-projects'" class="project-container">
                 <Card v-for="project in currentProjects" :key="project.id" :project="project" :image-url="project.projectImage"/>
@@ -538,6 +550,29 @@ export default {
 .projects-cart {
     height:300px;
     width:300px;
+}
+
+
+
+.card {
+  position: relative;
+}
+
+
+.notification-badge {
+  position: absolute;
+  top: -100px; /* Adjust this to move the badge outside of the card as desired */
+  right: -1000px; /* Adjust this to move the badge outside of the card as desired */
+  background-color: red;
+  color: white;
+  border-radius: 5000%;
+  padding: 5px;
+  font-size: 100rem;
+  z-index: 100; /* Ensure the badge is above the card */
+  /* Additional styles for centering content if needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 </style>
