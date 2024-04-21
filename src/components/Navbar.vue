@@ -16,7 +16,7 @@
                <router-link to = "/auth/register" class = "router-link">Register</router-link>
             </div>
             <div v-else id="profile-menu" @click="toggleDropdown" class="profile-dropdown">
-              <img v-bind:src="profileImageUrl" class="profile-icon" />
+              <img v-bind:src="profileImageUrl" alt="Profile" class="profile-icon" />
               <div v-if="dropdownOpen" class="dropdown-content">
                 <a @click="goUserProfile">Your Profile</a>
                 <a @click.prevent="tempLogout">Log Out</a>
@@ -35,13 +35,15 @@
     const db = getFirestore(firebaseApp);
 
     export default {
+
+    props: ['profileImageUrl'],
+
     data() {
         return {
             isLoggedIn : false,
             dropdownOpen: false,
             uid: '',
             userProfile: null,
-            profileImageUrl:''
         }
     }, 
     methods : {
