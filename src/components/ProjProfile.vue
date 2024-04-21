@@ -1,7 +1,8 @@
 <template>
     <div class="proj-profile-wrapper">
         <div class="heading">
-            <img src="../assets/CpppImage.png" alt="error" class="center-image">
+            <img v-if="projectBackground" :src="projectBackground" alt="error" class="center-image">
+            <img v-else src="../assets/CpppImage.png" alt="error" class="center-image">
 
             <div class="titleDetail">
                 <div class="title">
@@ -73,7 +74,7 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { getDoc, doc, updateDoc, arrayUnion, arrayRemove  } from "firebase/firestore";
+import { getDoc, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
@@ -97,6 +98,7 @@ export default {
             pendingMembers: [],
             projectMemberId: [],
             projectCompleted: false,
+            projectBackground: null,
         }
     },
 
@@ -111,6 +113,7 @@ export default {
             this.projectDescription = projectData.projectDescription;
             this.projectMemberId = projectData.projectMembers;
             this.projectCompleted = projectData.projectCompleted;
+            this.projectBackground = projectData.projectBackground;
 
             let hostDetail = {}
             let hostDetails = await getDoc(doc(db, "User Information", "" + projectData.projectHost));
@@ -151,7 +154,7 @@ export default {
                 pendingMembers: this.pendingMembers
             });
             const userRef = doc(db, "User Information", this.uid);
-            await updateDoc(userRef, {pendingProjects: arrayUnion(this.projectID)});
+            await updateDoc(userRef, { pendingProjects: arrayUnion(this.projectID) });
             alert("Applied for project");
         },
 
@@ -165,7 +168,7 @@ export default {
                 projectMembers: this.projectMemberId,
             });
             const userRef = doc(db, "User Information", this.uid);
-            await updateDoc(userRef, {currentProjects: arrayRemove(this.projectID)});
+            await updateDoc(userRef, { currentProjects: arrayRemove(this.projectID) });
             alert("Left project");
         },
 
@@ -180,7 +183,7 @@ export default {
                 pendingMembers: this.pendingMembers,
             });
             const userRef = doc(db, "User Information", this.uid);
-            await updateDoc(userRef, {pendingProjects: arrayRemove(this.projectID)});
+            await updateDoc(userRef, { pendingProjects: arrayRemove(this.projectID) });
 
             alert("Withdrawn application");
         },
