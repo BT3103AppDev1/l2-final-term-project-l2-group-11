@@ -42,8 +42,10 @@ export default {
         const listOfProjects = await getDocs(collection(db, "Project Collection"))
         listOfProjects.forEach((doc) => {
           let project = doc.data();
-          project.id = doc.id;
-          this.projects.push(project);
+          if (!project.projectCompleted) {
+            project.id = doc.id;
+            this.projects.push(project);
+          }
         });
         this.filteredProjects = this.projects;
       } catch (error) {
@@ -59,7 +61,8 @@ export default {
         const lowerCaseSearchTerm = this.searchInput.toLowerCase();
         this.filteredProjects = this.projects.filter(project =>
           project.projectName.toLowerCase().includes(lowerCaseSearchTerm) ||
-          project.projectDescription.toLowerCase().includes(lowerCaseSearchTerm)
+          project.projectDescription.toLowerCase().includes(lowerCaseSearchTerm) ||
+          project.skillsRequired.toLowerCase().includes(lowerCaseSearchTerm)
         );
       }
     },
@@ -88,19 +91,10 @@ export default {
       <div v-if = "searchInput.length == 0" class="projects-container">
         <div class="projectCategory">
             <div class="project-category-title">
-                <h4>Mobile App Development</h4>
+                <h4>All Projects</h4>
             </div>
             <div class="projects-cart">
             <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
-            </div>
-        </div>
-
-        <div class="projectCategory">
-            <div class="project-category-title">
-                <h4>Machine Learning</h4>
-            </div>
-            <div class="projects-cart">
-                <Card v-for="project in projects" :key="project.id" :project="project" :image-url="project.projectImage"/>
             </div>
         </div>
       </div>
@@ -213,7 +207,6 @@ mark.black {
   flex-direction:column;
   justify-content: flex-start;
   align-items: center;
-  overflow:scroll;
 }
 
 .projects-container .projectCategory {
@@ -239,13 +232,11 @@ mark.black {
 
 .projects-cart {
     width:100%;
-    height: 350px;
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap; /* This allows the items to wrap to the next line */
     justify-content: flex-start;
-    align-items: center;
-    gap: 30px;
-    overflow: scroll;
+    align-items: flex-start; /* Align items at the start of the cross axis */
+    gap: 30px; /* You can adjust this gap to your preference */
     padding-top:5px;
 }
 
