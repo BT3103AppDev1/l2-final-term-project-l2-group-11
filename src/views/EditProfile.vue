@@ -9,7 +9,7 @@
         props: ['userId'],
 
 
-        setup(props) {
+        setup(props, { emit }) {
             const route = useRoute();
             const router = useRouter();
 
@@ -58,6 +58,8 @@
                 formData.value.profileImageUrl = profileImageUrl.value;
                 const docRef = doc(db, 'User Information', userId);
                 await updateDoc(docRef, formData.value);
+                console.log(profileImageUrl.value);
+                emit('profile-updated', profileImageUrl.value);
                 router.push({ name: 'Profile', params: { userId } });
             };
 
