@@ -1,3 +1,4 @@
+
 <template>
     <h1>Ignite <span style="color:black">your</span> passion</h1><br>
     <div class="background">
@@ -39,7 +40,7 @@
             </div> <br>
 
             <div class="skill">
-                <h3>Skills</h3>
+                <h3>Skills (Add a comma between each skill)</h3>
                 <textarea id="skill" required v-model="skillsRequired"></textarea>
             </div> <br>
 
@@ -80,7 +81,7 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc,Timestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
@@ -166,22 +167,8 @@ export default {
 
         async saveChanges() {
             console.log("IN LP")
-            alert(" Saving changes to your project : " + projectName)
+            alert("Saving changes to your project")
 
-            if (!this.isValidDate(this.projectStart) || !this.isValidDate(this.projectEnd) || !this.isValidDate(this.signupDeadline)) {
-                alert("One or more dates have invalid format or in the past.");
-                return;
-            }
-
-            if (!this.compareDates(this.projectStart, this.projectEnd)) {
-                alert("The project end date must be after the project start date.");
-                return;
-            }
-
-            if (!this.compareDates(this.signupDeadline, this.projectEnd)) {
-                alert("The signup deadline must be before the project end date.");
-                return;
-            }
             try {
                 const docRef = await updateDoc(doc(db, "Project Collection", this.projectID), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
