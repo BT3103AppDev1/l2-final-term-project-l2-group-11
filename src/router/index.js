@@ -63,7 +63,7 @@ const routes = [
         props: true
     },
     {
-        path: '/ReviewsPage/:userId',
+        path: '/ReviewsPage/:userId/:projectId?',
         name: 'ReviewsPage',
         component: ReviewsPage,
     },
