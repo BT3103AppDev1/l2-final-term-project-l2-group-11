@@ -94,12 +94,24 @@ export default {
   font-weight: 550px;
 }
 
-.view {
-  text-align: center;
-  font-size: 23px;
-  font-weight: 550px;
-  cursor: pointer;
+
+  .view {
+  color: #F5793B;
+  font-size: 22px;
+  font-weight: 600;
+  background-color: white;
   padding-left: 15px;
   padding-top: 100px;
+  font-size: Garamond, serif;
 }
+
+.view:hover{
+  background-color: white;
+  font-size: 26px;
+}
+
+.view {
+    transition: font-size 700ms;
+}
+    
 </style>
