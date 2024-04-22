@@ -54,6 +54,18 @@ export default {
 
                     await setDoc(userDocRef, {
                         email: this.EmailAddress,
+                        skills: "",
+                        interests: "",
+                        shortBio: "",
+                        description: "",
+                        linkedin: "",
+                        instagram: "",
+                        telegram: "",
+                        savedProjects: [],
+                        pastProjects: [],
+                        currentProjects: [],
+                        hostedProjects: [],
+                        pendingProjects: [],
                     });
                     //store email address in the doc above.
 
@@ -63,7 +75,7 @@ export default {
                 } catch(error) {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                alert("Registeration is not successful, please try again!");
+                alert("Registration is not successful, please try again!");
             };
             }
             this.loading = false;
