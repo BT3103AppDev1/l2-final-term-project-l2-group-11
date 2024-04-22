@@ -1,7 +1,8 @@
 
 <template>
     <div class="heading">
-        <img src="../assets/CpppImage.png" alt="error" class="center-image"><br><br>
+        <img v-if="projectBackground" :src="projectBackground" alt="error" class="center-image">
+        <img v-else src="../assets/CpppImage.png" alt="error" class="center-image">
 
         <div class="project-management">
             <h1 class="project-management_title">
@@ -79,6 +80,7 @@ export default {
             projectMembers: [],
             pendingMembers: [],
             isCurrentMembersActive: true,
+            projectBackground: "",
             uid: "",
         };
     },
@@ -105,12 +107,12 @@ export default {
             this.projectName = projectData.projectName;
             this.currentID = projectData.projectMembers;
             this.pendingID = projectData.pendingMembers;
-
+            this.projectBackground = projectData.projectBackground;
             for (const memberID of this.currentID) {
                 let userDocRef = doc(db, "User Information", memberID);
                 let userDocSnap = await getDoc(userDocRef);
                 let userData = userDocSnap.data();
-                this.projectMembers.push({ name: userData.name, userID: memberID, profileImageUrl: userData.profileImageUrl });
+                this.projectMembers.push({ name: userData.name, userID: memberID, profileImageUrl: userData.profileImageUrl});
             }
 
             for (const memberID of this.pendingID) {
