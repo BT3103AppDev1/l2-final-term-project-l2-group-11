@@ -1,3 +1,4 @@
+
 <template>
     <div class="proj-profile-wrapper">
         <div class="heading">
@@ -193,7 +194,7 @@ export default {
         },
 
         visitProfilePage(userId) {
-            this.$router.push("/Profile/" + userId);
+            this.$router.push("/Profile/" + userId + "/" + this.projectID);
         }
     },
 
