@@ -98,6 +98,18 @@ export default {
                         email: user.email,
                         // You can add other user details here from the Google user object
                         filledQuestionaire: false,
+                        skills: "",
+                        interests: "",
+                        shortBio: "",
+                        description: "",
+                        linkedin: "",
+                        instagram: "",
+                        telegram: "",
+                        savedProjects: [],
+                        pastProjects: [],
+                        currentProjects: [],
+                        hostedProjects: [],
+                        pendingProjects: [],
                     });
                     // Redirect to complete registration if needed
                     this.$router.push({name: 'SignUpQuestionaire', params: { userId: user.uid } });
