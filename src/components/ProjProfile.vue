@@ -6,7 +6,9 @@
 
             <div class="titleDetail">
                 <div class="title">
+
                     <h1 id="projTitle">{{ projectName }}</h1>
+
                     <div v-if="projectCompleted" class="completed">Project Completed</div>
                     <div v-else>
                         <div v-if="this.uid == (projectMembers.length > 0 ? projectMembers[0].userId : '')"
@@ -241,13 +243,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 10%;
-    height: 60%;
+    height: 70%;
     width: 100%;
 }
 
 .titleDetail .title {
     height: 100%;
-    width: 70%;
+    width: 65%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -256,9 +258,14 @@ export default {
 }
 
 #projTitle {
-    font-size: 70px;
+    font-size: 40px;
     text-align: left;
+    padding-right: 10px;
+}
 
+.description {
+    height: 240px;
+    overflow: scroll;
 }
 
 .adminDetails {
@@ -330,7 +337,8 @@ export default {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 button {
