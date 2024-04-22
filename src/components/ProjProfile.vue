@@ -66,7 +66,7 @@
                 <span id="timeline">{{ projectStart }} to {{ projectEnd }}</span>
             </div>
 
-            <a id="findOutMore">Find Out More</a>
+            <a id="findOutMore" :href="this.findOutMore">Find Out More</a>
         </div>
     </div>
 </template>
@@ -99,6 +99,7 @@ export default {
             projectMemberId: [],
             projectCompleted: false,
             projectBackground: null,
+            findOutMore: "",
         }
     },
 
@@ -114,6 +115,7 @@ export default {
             this.projectMemberId = projectData.projectMembers;
             this.projectCompleted = projectData.projectCompleted;
             this.projectBackground = projectData.projectBackground;
+            this.findOutMore = projectData.Find_Out_More;
 
             let hostDetail = {}
             let hostDetails = await getDoc(doc(db, "User Information", "" + projectData.projectHost));
