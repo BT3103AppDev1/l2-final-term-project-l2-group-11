@@ -6,7 +6,7 @@
             <div class="text">
                 <div class="heading">
                     <span id="collab">Collab and Conquer <br> </span>
-                    <span id="meet"> Meet like-minded individuals <br> to work on project</span>
+                    <span id="meet"> Meet like-minded individuals <br> to work on a project with!</span>
                 </div>
                 <div class="subtitle">
                     Enhance your porforlio with anyone, anywhere, anytime
@@ -20,7 +20,7 @@
         <div class="students">
             <div class="intro">
                 <h1 id="title">Our Students </h1>
-                <span id="description">Our students come from various institution</span>
+                <span id="description">Cultivating elite talent from top-tier institutions</span>
             </div>
             <div class="logos">
                 <img src='./icons/client1.png'>
