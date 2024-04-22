@@ -22,8 +22,8 @@
         </div>
 
         <div class = "project-title">
-            <label for = "project-title-input">Project Title</label>
-            <input v-model = "projectTitle" placeholder = "Project Title" type="text" id = "project-title-input"/>
+            <h3>Project Title</h3>
+            <h4>{{ reviewProjectTitle }}</h4>
         </div>
         
         <div class = "review">
@@ -46,8 +46,7 @@ export default {
     data() {
         return {
             review:"",
-            ratings:1,
-            projectTitle:""
+            ratings:1
         }
     }, 
     methods : {
@@ -62,14 +61,12 @@ export default {
             currentDate = day + "/" + month + "/" + year;
             await setDoc(reviewRef, {
                 reviewerID : String(reviewerID),
-                projectTitle: String(this.projectTitle),
-                ratings : String(this.ratings),
+                projectTitle: String(this.reviewProjectTitle),
                 review : String(this.review),
                 date : currentDate
             });
             this.ratings = 1;
             this.review = "";
-            this.projectTitle = "";
             this.$emit("uploadReview");
             this.$emit("closeReviewFormPopup");
         },
@@ -77,7 +74,6 @@ export default {
             this.$emit("closeReviewFormPopup");
             this.ratings = 1;
             this.review = "";
-            this.projectTitle = "";
         },
         setRatingsToOne() {
             this.ratings = 1;
@@ -98,7 +94,8 @@ export default {
     emits: ["closeReviewFormPopup", "uploadReview"],
     props : {
         uid : String,
-        profileUserId : String
+        profileUserId : String,
+        reviewProjectTitle : String
     }
 }
 </script>
@@ -171,19 +168,18 @@ form {
     align-items: left;
 }
 
-.project-title label {
+.project-title h3 {
     color:orange;
+    font-size: 20px;
+    font-weight:500;
+}
+
+.project-title h4 {
+    color:black;
     font-size: 17px;
     font-weight:500;
-
 }
 
-.project-title input {
-    height :30px;
-    width:100%;
-    border-radius:5px;
-    border:1px solid orange;
-}
 
 .review { 
     margin-top:5px;
@@ -197,7 +193,7 @@ form {
 
 .review label {
     color:orange;
-    font-size: 17px;
+    font-size: 20px;
     font-weight:500;
 }
 
@@ -233,7 +229,4 @@ form {
     color:white;
 
 }
-
-
-
 </style>
