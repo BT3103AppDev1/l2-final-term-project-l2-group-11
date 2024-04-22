@@ -5,7 +5,7 @@ import AddReviewsForm from "../components/AddReviewsForm.vue";
 
 <template>
     <div v-show = "reviewFormPopup" class = "add-review-form">
-        <AddReviewsForm @closeReviewFormPopup = "closeAddReviewPopup" @uploadReview = "refreshReviews" :uid = "uid" :profileUserId = "profileUserId"/>
+        <AddReviewsForm @closeReviewFormPopup = "closeAddReviewPopup" @uploadReview = "refreshReviews" :reviewProjectTitle = "reviewProjectTitle" :uid = "uid" :profileUserId = "profileUserId"/>
     </div>
 
     <div class = "reviews-page-wrapper" :class = "{'block-background' : reviewFormPopup}">
@@ -13,7 +13,7 @@ import AddReviewsForm from "../components/AddReviewsForm.vue";
             <div class = "placeholder"></div>
             <h1>Past Reviews</h1>
             <div class = "placeholder">
-                <button v-show = "addReviewAvailable || true" v-on:click.prevent = "addReview">Add Review</button>
+                <button v-show = "addReviewAvailable" v-on:click.prevent = "addReview">Add Review</button>
             </div>
         </div>
 
@@ -43,7 +43,10 @@ export default {
             loading: true,
             uid:null,
             reviewFormPopup:false,
-            profileUserId : this.$route.params.userId
+            profileUserId : this.$route.params.userId,
+            projectId : this.$route.params.projectId,
+            addReviewAvailable : false,
+            reviewProjectTitle: ""
         }
     },
     mounted() {
@@ -52,6 +55,7 @@ export default {
             if (user) {
                 this.uid = user.uid;
                 this.fetchReviews();
+                this.canLeaveReviews();
             } else {
                 this.uid = null;
             }
@@ -90,6 +94,19 @@ export default {
         },
         refreshReviews() {
             this.fetchReviews();
+        },
+        async canLeaveReviews() {
+            if (this.uid !== this.profileUserId && this.projectId !== null) {
+                let docRef = doc(db, "Project Collection", this.projectId);
+                let docSnap = await getDoc(docRef);
+                let projectData = docSnap.data();
+                let projectMembers = projectData.projectMembers;
+                projectMembers.push(projectData.projectHost);
+                if (projectMembers.includes(this.uid)) {
+                    this.addReviewAvailable = true;
+                    this.reviewProjectTitle = projectData.projectName;
+                } 
+            }
         }
     }
 }
