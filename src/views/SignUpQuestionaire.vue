@@ -147,7 +147,7 @@ export default {
                 pendingProjects: [],
                 filledQuestionaire: true,
             }, {merge: true}); //merge true is used to not update the elements that are already in the document
-            console.log("document successfully updated!")
+            this.$emit('profile-updated', this.imageUrl);
             alert("Your Profile has been Successfully Created!")
 
             //after user clicks on save button, navigate him to the profile page.
