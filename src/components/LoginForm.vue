@@ -38,6 +38,9 @@ export default {
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                alert("Login unsuccessful, please try again!");
+                this.EmailAddress = "";
+                this.Password = "";
             });
             this.loading = false;
         },
