@@ -1,3 +1,4 @@
+
 <script>
 import Card from '../components/Card.vue';
 import firebaseApp from '../Firebase.js';
@@ -520,6 +521,7 @@ export default {
     width: 100%;
     padding: 0% 10%;
     padding-top: 20px;
+    padding-bottom: 20px;
     font-size: 17px;
     font-weight: 1000px;
     gap: 30px;
@@ -551,15 +553,13 @@ export default {
 }
 
 .project-container {
+    width:100%;
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap; /* This allows the items to wrap to the next line */
     justify-content: flex-start;
-    align-items: center;
-    height: 350px;
-    padding-top: 5px;
-    width: 100%;
-    gap: 25px;
-    overflow: scroll;
+    align-items: flex-start; /* Align items at the start of the cross axis */
+    gap: 30px; /* You can adjust this gap to your preference */
+    padding-top:5px;
 }
 
 .projects-cart {
