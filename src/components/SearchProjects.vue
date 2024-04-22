@@ -69,6 +69,10 @@ export default {
 
     createProject() {
       console.log('Project created!');
+    },
+
+    submitSearch() {
+      this.searchProjects();
     }
   }
 }
