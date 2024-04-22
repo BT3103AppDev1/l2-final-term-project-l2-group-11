@@ -244,10 +244,8 @@ mark.black {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  font-family: Garamond, serif;
   font-weight: 600;
   font-size: 40px;
-  text-decoration: underline;
   padding-bottom: 15px;
   font-weight: 600;
 }
@@ -269,6 +267,6 @@ mark.black {
 .all-projects {
   font-weight: 600;
   font-size: 40px;
-  text-decoration: underline;
+  /* text-decoration: underline; */
 }
 </style>

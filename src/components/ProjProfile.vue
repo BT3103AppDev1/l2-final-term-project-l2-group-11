@@ -1,4 +1,3 @@
-
 <template>
     <div class="proj-profile-wrapper">
         <div class="heading">
@@ -54,6 +53,7 @@
 
         <div class="detail">
             <div class="description">
+                <h2>Description</h2>
                 <p>{{ projectDescription }}</p>
             </div>
 
@@ -66,7 +66,7 @@
 
             <div class="commitment">
                 <h2>Project Commitment</h2>
-                <span id="timeline">{{ projectStart }} to {{ projectEnd }}</span>
+                <p>{{ projectStart }} to {{ projectEnd }}</p>
             </div>
 
             <a id="findOutMore" :href="this.findOutMore">Find Out More</a>
@@ -259,15 +259,26 @@ export default {
 }
 
 #projTitle {
-    font-size: 40px;
+    font-size: 55px;
     text-align: left;
     padding-right: 10px;
+    font-weight: 700
 }
 
 .description {
-    height: 240px;
-    overflow: scroll;
+  margin-top: 61px;
 }
+
+.description p{
+  font: 500 23px/30px;
+  margin-top: 19px;
+}
+
+.commitment p {
+ font-size: 20px;
+ margin-top: 10px;
+}
+
 
 .adminDetails {
     display: flex;
@@ -359,6 +370,8 @@ button {
     transition-duration: 0.3s;
     -webkit-transition-property: box-shadow, transform;
     transition-property: box-shadow, transform;
+    font-weight: 500;
+
 }
 
 button:hover,
@@ -386,7 +399,9 @@ button:active {
 }
 
 
-.detail .skillsRequired h2,
+
+
+.detail .skillsRequired h2, .description h2,
 .detail .commitment h2 {
     font-size: 25px;
     font-weight: bold;
@@ -394,13 +409,13 @@ button:active {
 }
 
 #findOutMore {
-    color: rgb(255, 157, 0);
-    font-size: 20px;
+    color: rgb(248, 128, 0);
+    font-size: 23px;
     font-weight: bold;
     background-color: transparent;
     transition: font-size 700ms;
     margin-bottom: 30px;
-    ;
+    font: 500 23px/30px;
 }
 
 #findOutMore:hover {
