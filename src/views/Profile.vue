@@ -1,12 +1,12 @@
+
 <script>
 import Card from '../components/Card.vue';
 import firebaseApp from '../Firebase.js';
 import firebase from '../uifire.js';
 import 'firebase/compat/auth';
-import { ref, onMounted } from 'vue';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getAuth, onAuthStateChanged, reload } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const db = getFirestore(firebaseApp);
 
@@ -25,14 +25,15 @@ export default {
         return {
             activeTab: 'my-projects', // Default active tab
             userstate: false,
-            uid: "",
-            userProfile: null,
+            uid: '',
+            userData : {},
             hostedProjects: [],
             currentProjects: [],
             pastProjects: [],
             savedProjects: [],
             pendingProjects: [],
-        
+            icons : {}
+         
         };
     },
 
@@ -41,29 +42,23 @@ export default {
             if (user) {
                 this.userstate = true; // User is logged in
                 this.uid = user.uid;
-                const userRef = doc(db, 'User Information', this.userId);
-                const userSnap = await getDoc(userRef);
-                this.userProfile = userSnap.data();
-                this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects) || [];
-                this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects) || [];
-                this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects) || [];
-                this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects) || [];
-                this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects) || [];
+                this.getUserProfile(this.userId);
                 
             } else {
                 this.userstate = false;
             }
-        });
-
+        })
     },
 
     methods: {
-
         setActiveTab(tab) {
             this.activeTab = tab;
         },
 
         convertIdToProjects(idList) {
+            if (idList === null) {
+                return;
+            }
             let newProjectList = [];
             for (let i = 0; i < idList.length; i++) {
                 let docRef = doc(db, 'Project Collection', idList[i]);
@@ -80,37 +75,6 @@ export default {
             return newProjectList;
         },
 
-        //method to trigger file input
-        triggerEditProfileUpload() {
-            this.$refs.editProfileUpload.click();
-        },
-
-        //method to handle the file selection
-        async handleEditProfileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                //handle the case where no files were selected
-                return;
-            }
-
-            try {
-                const storage = getStorage(firebaseApp);
-                const imageRef = storageRef(storage, 'profileImages/' + this.userId + '/' + file.name);
-                const snapshot = await uploadBytes(imageRef, file);
-                const downloadURL = await getDownloadURL(snapshot.ref);
-
-                // Save the image URL in Firestore
-                const docRef = doc(getFirestore(), 'User Information', this.userId);
-                await setDoc(docRef, { profileImageUrl: downloadURL }, { merge: true });
-
-                // Update the userData reactive property
-                this.userData.profileImageUrl = downloadURL;
-
-            } catch (error) {
-                console.error("Error uploading image: ", error);
-            }
-        },
-
         editProfile() {
             this.$router.push({ name: 'EditProfile', params: { userId: this.uid } });
         },
@@ -122,68 +86,38 @@ export default {
                 this.$router.push({ name: 'ReviewsPage', params: { userId: this.userId} });
             }
         },
-
-    },
-
-    setup(props) {
-
-
-        const userData = ref({}); // This will hold our user data
-        // const userId = 'theUserIdFromAuth'; // You'll get this from your auth state
-
-        const icons = ref({
-            linkedin: '',
-            instagram: '',
-            telegram: '',
-        });
-
-        const storage = getStorage(firebaseApp);
-
-        //load user data while page loads
-        onMounted(async () => {
-            const db = getFirestore();
-            const docRef = doc(db, 'User Information', "" + props.userId);
-            //of the authentication state of the page. e.g. whether the user is logged in 
-
-            try {
-                const linkedinIconRef = storageRef(storage, 'LinkedIn.png');
-                const instagramIconRef = storageRef(storage, 'Instagram.jpeg');
-                const telegramIconRef = storageRef(storage, 'Telegram.png');
-
-                icons.value.linkedin = await getDownloadURL(linkedinIconRef);
-                icons.value.instagram = await getDownloadURL(instagramIconRef);
-                icons.value.telegram = await getDownloadURL(telegramIconRef);
-
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    console.log("successful")
-                    userData.value = docSnap.data();
-                    userData.value.interestsArray = userData.value.interests.split(', ');
-                    userData.value.skillsArray = userData.value.skills.split(', ');
-
-                } else {
-                    console.log('No such document!');
-                }
-            } catch (error) {
-                console.error("Error getting document:", error);
-            }
-
-        });
-
-        return {
-            userData,
-            icons,
-        };
-    },
-
-    watch: {
-    '$route.params.userId': function(newUserId, oldUserId) {
-        if (newUserId !== oldUserId) {
-            window.location.reload();
+        async getUserProfile(userId) {
+            const userRef = doc(db, 'User Information', userId);
+            const userSnap = await getDoc(userRef);
+            let userProfile = userSnap.data();
+            this.hostedProjects = this.convertIdToProjects(userProfile.hostedProjects);
+            this.currentProjects = this.convertIdToProjects(userProfile.currentProjects);
+            this.pastProjects = this.convertIdToProjects(userProfile.pastProjects);
+            this.savedProjects = this.convertIdToProjects(userProfile.savedProjects);
+            this.pendingProjects = this.convertIdToProjects(userProfile.pendingProjects);
+            this.userData.profileImageUrl = userProfile.profileImageUrl;
+            this.userData.name = userProfile.name;
+            this.userData.shortBio = userProfile.shortBio;
+            this.userData.interestsArray = userProfile.interests.split(", ");
+            this.userData.skillsArray = userProfile.skills.split(", ");
+            this.userData.description = userProfile.description;
+            this.userData.linkedin = userProfile.linkedin;
+            this.userData.instagram = userProfile.instagram;
+            this.userData.telegram = userProfile.telegram;
+            const storage = getStorage(firebaseApp);
+            const linkedinIconRef = storageRef(storage, 'LinkedIn.png');
+            const instagramIconRef = storageRef(storage, 'Instagram.jpeg');
+            const telegramIconRef = storageRef(storage, 'Telegram.png');
+            this.icons.linkedin = await getDownloadURL(linkedinIconRef);
+            this.icons.instagram = await getDownloadURL(instagramIconRef);
+            this.icons.telegram = await getDownloadURL(telegramIconRef);
+        },
+    }, 
+    watch : {
+        $route(to, from) {
+            this.getUserProfile(this.$route.params.userId);     
         }
     }
-},
 }
 </script>
 
