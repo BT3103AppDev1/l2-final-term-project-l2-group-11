@@ -44,6 +44,7 @@
             dropdownOpen: false,
             uid: '',
             userProfile: null,
+            profileImageUrl:''
         }
     }, 
     methods : {
