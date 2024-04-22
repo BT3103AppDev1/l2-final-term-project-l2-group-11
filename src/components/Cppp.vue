@@ -1,289 +1,208 @@
 <template>
-    <h1>Ignite <span style="color:black">your</span> passion</h1><br>
-    <div class="background">
-        <img id="backgroundImage" v-if="projectBackground" :src="projectBackground" alt="not found">
-        <img id="backgroundImage" v-else src="../assets/CpppImage.png" alt="not found">
-        <br>
-        <button id="addBackground" @click="triggerFileUploadForBackground">Add Background</button>
-        <!-- Hidden file input -->
-        <input type="file" id="backgroundUpload" ref="backgroundUpload" @change="handleBackgroundUpload($event)"
-            style="display: none;">
-    </div> <br> <br>
+    <div class="proj-profile-wrapper">
+        <div class="heading">
+            <img v-if="projectBackground" :src="projectBackground" alt="error" class="center-image">
+            <img v-else src="../assets/CpppImage.png" alt="error" class="center-image">
 
-    <div class="container">
-        <div class="left-side">
-            <div class="thumbnail">
-                <div class="thumbnailImage">
-                    <img id="thumbnail" v-if="projectImage" :src="projectImage" alt="not found">
-                    <img id="thumbnail" v-else src="../assets/CpppThumbnail.png" alt="not found">
-                </div> <br>
+            <div class="titleDetail">
+                <div class="title">
 
-                <div class="addThumbnailButton">
-                    <br> <br>
-                    <button id="addThumbnail" @click="triggerFileUpload">Add Thumbnail</button>
-                </div> <br>
-                <!-- Hidden file input -->
-                <input type="file" id="photoUpload" ref="photoUpload" @change="handleFileUpload($event)"
-                    style="display: none;">
-            </div> <br>
-            <div class="description">
-                <h3>Description</h3>
-                <textarea id="description" required v-model="projectDescription"></textarea>
-            </div> <br>
-        </div>
+                    <h1 id="projTitle">{{ projectName }}</h1>
 
-        <div class="right-side">
-            <div class="projectName">
-                <h3>Project Name</h3>
-                <textarea id="projectName" required v-model="projectName"></textarea>
-            </div> <br>
+                    <div v-if="projectCompleted" class="completed">Project Completed</div>
+                    <div v-else>
+                        <div v-if="this.uid == (projectMembers.length > 0 ? projectMembers[0].userId : '')"
+                            class="buttonsForHost">
+                            <button id="button1"
+                                @click="$router.push({ name: 'EditProjectProfile', params: { id: this.projectID } })">
+                                Edit Project Detail</button>
+                            <button id="button2" @click="manageProject">Manage Project</button>
+                        </div>
 
-            <div class="skill">
-                <h3>Skills</h3>
-                <textarea id="skill" required v-model="skillsRequired"></textarea>
-            </div> <br>
+                        <div v-else-if="this.pendingMembers.includes(this.uid)" class="buttonForPendingApplication">
+                            <button id="button1" @click="withdrawApplication">Withdraw Application</button>
+                        </div>
 
-            <div class="membersRequired">
-                <h3>Number of Members</h3>
-                <textarea id="membersRequired" required v-model="membersRequired"></textarea>
-            </div> <br>
+                        <div v-else-if="this.projectMemberId.includes(this.uid)" class="buttonsForMember">
+                            <button id="button1" @click="leaveProject">Leave Project</button>
+                        </div>
 
-            <div class="signUpDeadline">
-                <h3>Sign Up Deadline</h3>
-                <input type="date" id="signUpDeadline" required v-model.lazy="signupDeadline">
-            </div> <br>
+                        <div v-else class="buttonsForOther">
+                            <button id="button1" @click="applyForProject">Apply For Project</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="projectStart">
-                <h3>Project Start Date</h3>
-                <input type="date" id="projectStart" required v-model.lazy="projectStart">
-            </div> <br>
-
-            <div class="projectEnd">
-                <h3>Project End Date</h3>
-                <input type="date" id="projectEnd" required v-model.lazy="projectEnd">
-            </div> <br>
-
-            <div class="findOutMore">
-                <h3>Link</h3>
-                <textarea id="findOutMore" v-model="findOutMore"></textarea>
+                <div class="adminDetails">
+                    <div v-show="projectMembers.length > 0" class=host-details>
+                        <h4>Project Host:</h4>
+                        <img v-bind:src="projectMembers.length > 0 ? projectMembers[0].profileImageUrl : ''"
+                            v-on:click="visitProfilePage(projectMembers[0].userId)" />
+                    </div>
+                    <div v-show="projectMembers.length > 0" class=members-details>
+                        <h4>Project Members: {{ projectMembers.length > 1 ? "" : "No member yet!" }}</h4>
+                        <div v-for="member in projectMembers.slice(1)" class="members-container">
+                            <img v-bind:src=member.profileImageUrl v-on:click="visitProfilePage(member.userId)" />
+                        </div>
+                    </div>
+                    <h4>Members Required: {{ membersRequired }}</h4>
+                    <h4>Sign-up Deadline: {{ signupDeadline }}</h4>
+                </div>
             </div>
         </div>
-    </div> <br>
 
-    <div class="launchProj">
-        <button @click="launchProject(), $router.push('Project')"
-            :disabled="projectEnd === null || projectStart === null || signupDeadline === null || skillsRequired == '' || membersRequired == '' || projectDescription == '' || projectName == ''">Launch
-            Project</button>
+        <div class="detail">
+            <div class="description">
+                <p>{{ projectDescription }}</p>
+            </div>
+
+            <div class="skillsRequired">
+                <h2>Skills Required</h2>
+                <div class="tags-container">
+                    <span class="tags" v-for="skill in skillsRequired" :key="skills">{{ skill }}</span>
+                </div>
+            </div>
+
+            <div class="commitment">
+                <h2>Project Commitment</h2>
+                <span id="timeline">{{ projectStart }} to {{ projectEnd }}</span>
+            </div>
+
+            <a id="findOutMore" :href="this.findOutMore">Find Out More</a>
+        </div>
     </div>
 </template>
 
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, addDoc, collection, updateDoc, Timestamp, arrayUnion } from "firebase/firestore";
+import { getDoc, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+
+
 const db = getFirestore(firebaseApp);
 
 export default {
-    name: 'Cppp',
+    name: 'ProjProfile',
 
     data() {
         return {
-            defaultThumbnail: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppThumbnail.png?alt=media&token=d0384134-d797-4e93-a83c-4e21d957909b',
-            defaultBackground: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppImage.png?alt=media&token=1a7b60af-7c62-4b51-bfe0-fdd282569967',
-            pageBackgroundColor: '#FDF8F6',
+            projectID: "",
             projectName: "",
             projectDescription: "",
-            skillsRequired: "",
-            membersRequired: "",
-            signupDeadline: null,
-            findOutMore: "",
-            projectHost: "",
             projectMembers: [],
-            projectID: "",
-            projectStart: null,
-            projectEnd: null,
-            projectImage: null,
-            projectImagePreview: null,
-            projectBackground: null,
-            projectBackgroundPreview: null,
+            membersRequired: 0,
+            signupDeadline: "",
+            skillsRequired: [],
+            projectStart: "",
+            projectEnd: "",
+            uid: "",
             pendingMembers: [],
-            projectCompleted: false
+            projectMemberId: [],
+            projectCompleted: false,
+            projectBackground: null,
+            findOutMore: "",
         }
     },
 
     methods: {
-        setBodyBackGroundColor(color) {
-            //apply background color to the body of the webpage
-            document.body.style.backgroundColor = color;
-        },
+        async fetchProjectDetails() {
+            let tempProjectMember = [];
+            this.projectID = this.$route.params.id;
+            let docRef = doc(db, "Project Collection", this.projectID);
+            let docSnap = await getDoc(docRef);
+            let projectData = docSnap.data()
+            this.projectName = projectData.projectName;
+            this.projectDescription = projectData.projectDescription;
+            this.projectMemberId = projectData.projectMembers;
+            this.projectCompleted = projectData.projectCompleted;
+            this.projectBackground = projectData.projectBackground;
+            this.findOutMore = projectData.Find_Out_More;
 
-        // isValidDate(dateStr) {
-        //     const regex = /^\d{2}\/\d{2}\/\d{4}$/; // Checks for the "DD/MM/YYYY" format
-        //     if (!dateStr.match(regex)) {
-        //         return false; // Returns false if date does not match the format
-        //     }
+            let hostDetail = {}
+            let hostDetails = await getDoc(doc(db, "User Information", "" + projectData.projectHost));
+            hostDetail.userId = projectData.projectHost;
+            hostDetail.profileImageUrl = hostDetails.data().profileImageUrl;
+            tempProjectMember.push(hostDetail);
 
-        //     const [day, month, year] = dateStr.split("/").map(Number);
-        //     const date = new Date(year, month - 1, day); // Creates a Date object
-
-        //     const now = new Date(); // Current date for comparison
-        //     now.setHours(0, 0, 0, 0); // Normalize current date to avoid hour-minute-second comparison
-
-        //     // Check if it's a valid date and not in the past
-        //     if (date.getTime() < now.getTime() || date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
-        //         return false;
-        //     }
-
-        //     return true;
-        // },
-
-        // compareDates(start, end) {
-        //     const [startDay, startMonth, startYear] = start.split("/").map(Number);
-        //     const [endDay, endMonth, endYear] = end.split("/").map(Number);
-
-        //     const startDate = new Date(startYear, startMonth - 1, startDay);
-        //     const endDate = new Date(endYear, endMonth - 1, endDay);
-
-        //     return endDate > startDate; // True if end date is after start date
-        // },
-
-        convertDateToTimestamp(dateStr) {
-            // Assuming dateStr is in "YYYY-MM-DD"
-            const parts = dateStr.split("-"); // Split the string into parts
-            const date = new Date(parts[0], parts[1] - 1, parts[2]); // Create a new Date object, note months are 0-indexed
-
-            return Timestamp.fromDate(date); // Convert the Date object to a Firestore Timestamp
-        },
-
-        async launchProject() {
-            console.log("IN LP")
-            alert(" Launching your project : " + projectName)
-
-            try {
-                const docRef = await addDoc(collection(db, "Project Collection"), {
-                    projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
-                    Find_Out_More: this.findOutMore, membersRequired: parseInt(this.membersRequired), projectStart: this.convertDateToTimestamp(this.projectStart),
-                    projectEnd: this.convertDateToTimestamp(this.projectEnd), signupDeadline: this.convertDateToTimestamp(this.signupDeadline), projectID: this.projectID, projectHost: this.projectHost,
-                    projectMembers: this.projectMembers, projectImage: this.projectImage != null ? this.projectImage : this.defaultThumbnail, projectBackground: this.projectBackground != null ? this.projectBackground : this.defaultBackground,
-                    pendingMembers: this.pendingMembers,
-                    projectCompleted: this.projectCompleted
-                });
-                let updateDocRef = doc(db, 'Project Collection', docRef.id);
-                await updateDoc(updateDocRef, { projectID: docRef.id });
-                let hostRef = doc(db, 'User Information', this.projectHost);
-                await updateDoc(hostRef, { hostedProjects: arrayUnion(docRef.id), currentProjects: arrayUnion(docRef.id) });
+            for (let i = 0; i < projectData.projectMembers.length; i++) {
+                let memberDetails = await getDoc(doc(db, "User Information", "" + projectData.projectMembers[i]));
+                let memberDetail = {};
+                memberDetail.userId = projectData.projectMembers[i];
+                memberDetail.profileImageUrl = memberDetails.data().profileImageUrl;
+                tempProjectMember.push(memberDetail);
             }
-            catch (error) {
-                console.error("Error adding document: ", error);
-            }
+            this.projectMembers = tempProjectMember;
+            this.membersRequired = projectData.membersRequired;
+            this.signupDeadline = projectData.signupDeadline.toDate().toDateString();
+            this.skillsRequired = projectData.skillsRequired.split(",");
+            this.projectStart = projectData.projectStart.toDate().toDateString();
+            this.projectEnd = projectData.projectEnd.toDate().toDateString();
+            this.pendingMembers = projectData.pendingMembers;
+
         },
 
-        triggerFileUpload() {
-            // Trigger the hidden file input when the button is clicked
-            this.$refs.photoUpload.click();
+        manageProject() {
+            const id = this.projectID
+
+            this.$router.push({ path: `/ManagePrj/${id}` })
+            //this.$router.push({name: "/ManagePrj", params: {id: this.projectID}});
         },
 
-        // Handle the file being selected
-        handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Proceed to read and upload the file
-                this.previewImage(file);
-            }
+        async applyForProject() {
+            // Add the user to the pending members list
+            this.pendingMembers.push(this.uid);
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                pendingMembers: this.pendingMembers
+            });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, { pendingProjects: arrayUnion(this.projectID) });
+            alert("Applied for project");
         },
 
-        // Function to read the file and display a preview
-        async previewImage(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.projectImagePreview = e.target.result;
-            };
-
-            reader.onloadend = async () => {
-                const downloadURL = await this.uploadImage(file);
-                if (downloadURL) {
-                    this.projectImage = downloadURL;
-                }
-            };
-            reader.readAsDataURL(file); // Start reading the file
+        async leaveProject() {
+            // Remove the user from the project members list
+            this.projectMemberId = this.projectMemberId.filter(member => member !== this.uid);
+            this.projectMembers = this.projectMembers.filter(member => member.userId !== this.uid);
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                projectMembers: this.projectMemberId,
+            });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, { currentProjects: arrayRemove(this.projectID) });
+            alert("Left project");
         },
 
-        //handles the upload of the image to Firebase Storage.
-        async uploadImage(file) {
-            const storage = getStorage(firebaseApp);
-            const imageRef = storageRef(storage, 'projectImages/' + this.projectID + '/' + file.name);
+        async withdrawApplication() {
+            // Remove the user from the pending members list
+            this.pendingMembers = this.pendingMembers.filter(member => member !== this.uid);
 
-            try {
-                // Upload the file to Firebase Storage
-                const snapshot = await uploadBytes(imageRef, file);
 
-                // Return the download URL
-                const downloadURL = await getDownloadURL(snapshot.ref);
-                return downloadURL;
-            } catch (error) {
-                console.error("Failed to upload image: ", error);
-                throw error;
-            }
+            // Update the project document
+            const docRef = doc(db, "Project Collection", this.projectID)
+            await updateDoc(docRef, {
+                pendingMembers: this.pendingMembers,
+            });
+            const userRef = doc(db, "User Information", this.uid);
+            await updateDoc(userRef, { pendingProjects: arrayRemove(this.projectID) });
+
+            alert("Withdrawn application");
         },
 
-
-        triggerFileUploadForBackground() {
-            // Trigger the hidden file input when the button is clicked
-            this.$refs.backgroundUpload.click();
-        },
-
-        handleBackgroundUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Proceed to read and upload the file
-                this.previewBackground(file);
-            }
-        },
-
-        // Function to read the file and display a preview
-        async previewBackground(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.projectBackgroundPreview = e.target.result;
-            };
-
-            reader.onloadend = async () => {
-                const downloadURL = await this.uploadBackground(file);
-                if (downloadURL) {
-                    this.projectBackground = downloadURL;
-                }
-            };
-            reader.readAsDataURL(file); // Start reading the file
-        },
-
-        //handles the upload of the image to Firebase Storage.
-        async uploadBackground(file) {
-            const storage = getStorage(firebaseApp);
-            const imageRef = storageRef(storage, 'projectBackground/' + this.projectID + '/' + file.name);
-
-            try {
-                // Upload the file to Firebase Storage
-                const snapshot = await uploadBytes(imageRef, file);
-
-                // Return the download URL
-                const downloadURL = await getDownloadURL(snapshot.ref);
-                return downloadURL;
-            } catch (error) {
-                console.error("Failed to upload image: ", error);
-                throw error;
-            }
-        },
+        visitProfilePage(userId) {
+            this.$router.push("/Profile/" + userId);
+        }
     },
 
     mounted() {
-        this.setBodyBackGroundColor(this.pageBackgroundColor);
-
+        this.fetchProjectDetails();
         const auth = getAuth();
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                this.projectHost = user.uid;
+                this.uid = user.uid;
             }
         });
     }
@@ -291,75 +210,149 @@ export default {
 </script>
 
 <style scoped>
-h1 {
-    text-align: center;
-    font-size: 45px;
-    color: #f5793b;
-}
-
-h3 {
-    font-size: 20px;
-    color: #f5793b;
-}
-
-.background {
-    text-align: center;
-    overflow: hidden;
-}
-
-#backgroundImage {
-    height: 200px;
-    width: 80%;
-}
-
-.thumbnail {
+.proj-profile-wrapper {
+    height: 100%;
+    width: 100%;
+    background-color: white;
     display: flex;
-    gap: 30px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: scroll;
 }
 
-.thumbnailImage {
-    width: 50%;
-    text-align: right;
-    overflow: hidden;
-}
-
-.thumbnailImage img {
-    height: 180px;
-    width: 360px;
-    height: auto;
-}
-
-.container {
+.heading {
+    height: 55%;
+    width: 100%;
+    background-color: #ffece4;
     display: flex;
-    margin-left: 10%;
-    margin-right: 5%;
-    gap: 5%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-input {
-    font-size: 35px;
+.heading img {
+    height: 40%;
+    width: 100%;
+    object-fit: fill;
 }
 
-.right-side {
-    width: 50%;
+.titleDetail {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10%;
+    height: 70%;
+    width: 100%;
 }
 
-#description {
-    height: 400px;
+.titleDetail .title {
+    height: 100%;
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+
+}
+
+#projTitle {
+    font-size: 40px;
+    text-align: left;
+    padding-right: 10px;
+}
+
+.description {
+    height: 240px;
+    overflow: scroll;
+}
+
+.adminDetails {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: right;
+    font-size: 15px;
+    font-weight: 1000;
+    height: 100%;
+    width: 30%;
+    gap: 15px;
+}
+
+.adminDetails h4 {
+    font-size: 17px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.adminDetails>h4 {
+    height: 40px;
+}
+
+.host-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+}
+
+.host-details img,
+.members-container img {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.members-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+}
+
+.members-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    height: 40px;
+}
+
+
+.buttonsForHost,
+.buttonsForMember,
+.buttonsForOther,
+.buttonForPendingApplication {
+    display: flex;
+    gap: 50px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 button {
-    background-color: #f5793b;
+    background-color: rgb(255, 111, 0);
     border: none;
     color: white;
-    padding: 20px;
-    width: 200px;
+    padding: 13px;
+    width: 175px;
     text-align: center;
     text-decoration: none;
     font-size: 18px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     -webkit-transition-duration: 0.3s;
     transition-duration: 0.3s;
@@ -375,24 +368,78 @@ button:active {
     transform: scale(1.1);
 }
 
-textarea {
-    height: 50px;
-    resize: none;
-    outline: none;
-    width: 90%;
-    font-size: 18px;
-    padding: 15px;
-    border-radius: 3px;
-    border: none;
-    background-color: rgb(212, 211, 211);
-}
-
-.launchProj {
+.detail {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: left;
+    padding: 0 10%;
+    gap: 30px;
+    width: 100%;
 }
 
-.launchProj button:disabled {
-    background-color: gray;
+.detail .description p {
+    margin-top: 10px;
+    font-size: 20px;
+    text-align: left;
+}
+
+
+.detail .skillsRequired h2,
+.detail .commitment h2 {
+    font-size: 25px;
+    font-weight: bold;
+    text-align: left;
+}
+
+#findOutMore {
+    color: rgb(255, 157, 0);
+    font-size: 20px;
+    font-weight: bold;
+    background-color: transparent;
+    transition: font-size 700ms;
+    margin-bottom: 30px;
+    ;
+}
+
+#findOutMore:hover {
+    font-size: 23px;
+    background-color: transparent;
+
+}
+
+.tags-container {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tags {
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: black;
+    background-color: rgb(181, 174, 174);
+    padding: 0px 10px;
+    margin-right: 10px;
+}
+
+.completed {
+    justify-content: center;
+    border-radius: 4px;
+    background-color: #263238;
+    align-self: start;
+    margin-top: 26px;
+    color: #fff;
+    text-align: center;
+    padding: 14px 32px;
+    font: 20px/120% Inter, sans-serif;
+    border: none;
 }
 </style>
