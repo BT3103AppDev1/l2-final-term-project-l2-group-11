@@ -1,4 +1,3 @@
-
 <script>
 import Card from '../components/Card.vue';
 import firebaseApp from '../Firebase.js';
@@ -7,7 +6,7 @@ import 'firebase/compat/auth';
 import { ref, onMounted } from 'vue';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, reload } from "firebase/auth";
 
 const db = getFirestore(firebaseApp);
 
@@ -26,14 +25,14 @@ export default {
         return {
             activeTab: 'my-projects', // Default active tab
             userstate: false,
-            uid: '',
+            uid: "",
             userProfile: null,
             hostedProjects: [],
             currentProjects: [],
             pastProjects: [],
             savedProjects: [],
             pendingProjects: [],
-         
+        
         };
     },
 
@@ -45,16 +44,17 @@ export default {
                 const userRef = doc(db, 'User Information', this.userId);
                 const userSnap = await getDoc(userRef);
                 this.userProfile = userSnap.data();
-                this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects);
-                this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects);
-                this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
-                this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
-                this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
+                this.hostedProjects = this.convertIdToProjects(this.userProfile.hostedProjects) || [];
+                this.currentProjects = this.convertIdToProjects(this.userProfile.currentProjects) || [];
+                this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects) || [];
+                this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects) || [];
+                this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects) || [];
                 
             } else {
                 this.userstate = false;
             }
-        })
+        });
+
     },
 
     methods: {
@@ -121,7 +121,8 @@ export default {
             } else {
                 this.$router.push({ name: 'ReviewsPage', params: { userId: this.userId} });
             }
-        }
+        },
+
     },
 
     setup(props) {
@@ -173,10 +174,16 @@ export default {
         return {
             userData,
             icons,
-            // triggerEditProfileUpload,
-            // handleEditProfileUpload
         };
     },
+
+    watch: {
+    '$route.params.userId': function(newUserId, oldUserId) {
+        if (newUserId !== oldUserId) {
+            window.location.reload();
+        }
+    }
+},
 }
 </script>
 
