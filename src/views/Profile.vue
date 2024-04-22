@@ -33,7 +33,7 @@ export default {
             pastProjects: [],
             savedProjects: [],
             pendingProjects: [],
-            addReviewAvailable: true
+         
         };
     },
 
@@ -50,9 +50,7 @@ export default {
                 this.pastProjects = this.convertIdToProjects(this.userProfile.pastProjects);
                 this.savedProjects = this.convertIdToProjects(this.userProfile.savedProjects);
                 this.pendingProjects = this.convertIdToProjects(this.userProfile.pendingProjects);
-                if (this.uid === this.userId || projectId === null) {
-                    this.addReviewAvailable = false;
-                }
+                
             } else {
                 this.userstate = false;
             }
@@ -118,7 +116,11 @@ export default {
         },
 
         goToReviewsPage() {
-            this.$router.push({ name: 'ReviewsPage', params: { userId: this.userId } });
+            if (this.projectId !== null) {
+                this.$router.push({ name: 'ReviewsPage', params: { userId: this.userId, projectId : this.projectId} });
+            } else {
+                this.$router.push({ name: 'ReviewsPage', params: { userId: this.userId} });
+            }
         }
     },
 
@@ -229,8 +231,7 @@ export default {
 
             <div class="socialMediaWrapper"> <!--to wrap the social media icons on the rhs-->
                 <button v-show="uid === userId" id="edit-profile" @click="editProfile"> Edit Profile </button>
-                <button id='reviewsButton' @click="goToReviewsPage"
-                    :addReviewAvailable="addReviewAvailable">Reviews</button>
+                <button id='reviewsButton' @click="goToReviewsPage">Reviews</button>
 
                 <h2 class="socialMediaHeading">Social Media</h2> <!-- Heading for the icons -->
 
