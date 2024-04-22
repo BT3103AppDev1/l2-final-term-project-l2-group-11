@@ -1,3 +1,4 @@
+
 <template>
     <form id = "authForm">
         <div class = "label-input-div">
@@ -75,7 +76,12 @@ export default {
                 } catch(error) {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                alert("Registration is not successful, please try again!");
+                if (errorCode == "auth/email-already-in-use") {
+                    alert("This email already has a registered account.")
+                } else {
+                    alert("Please enter a valid email.")
+                }
+                //alert("Registration is not successful, please try again!");
             };
             }
             this.loading = false;
