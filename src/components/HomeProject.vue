@@ -80,6 +80,7 @@ export default {
 }
 
 .projects-cart {
+  padding-left: 5%;
   height: 350px;
   display: flex;
   flex-direction: row;
