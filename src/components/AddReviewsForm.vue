@@ -63,7 +63,8 @@ export default {
                 reviewerID : String(reviewerID),
                 projectTitle: String(this.reviewProjectTitle),
                 review : String(this.review),
-                date : currentDate
+                date : currentDate,
+                ratings : this.ratings
             });
             this.ratings = 1;
             this.review = "";
