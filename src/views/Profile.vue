@@ -527,7 +527,6 @@ export default {
   align-items: left;
   justify-content: flex-start;
   font-size: 17px;
-  overflow: scroll;
 }
 
 .socialMediaWrapper {
