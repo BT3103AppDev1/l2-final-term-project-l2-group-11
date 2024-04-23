@@ -223,7 +223,7 @@ export default {
 }
 
 .heading {
-    height: 55%;
+    height: 500px;
     width: 100%;
     background-color: #ffece4;
     display: flex;
@@ -263,20 +263,6 @@ export default {
     text-align: left;
     padding-right: 10px;
     font-weight: 700
-}
-
-.description {
-  margin-top: 61px;
-}
-
-.description p{
-  font: 500 23px/30px;
-  margin-top: 19px;
-}
-
-.commitment p {
- font-size: 20px;
- margin-top: 10px;
 }
 
 
@@ -388,13 +374,22 @@ button:active {
     justify-content: flex-start;
     align-items: left;
     padding: 0 10%;
-    gap: 30px;
+    gap: 20px;
     width: 100%;
+    margin-top:20px;
 }
 
 .detail .description p {
     margin-top: 10px;
     font-size: 20px;
+    font-weight: 400;
+    text-align: left;
+}
+
+.detail .commitment p {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 400;
     text-align: left;
 }
 

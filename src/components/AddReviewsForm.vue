@@ -27,8 +27,8 @@
         </div>
         
         <div class = "review">
-            <label for = "review-textarea">Review</label>
-            <textarea rows = "6" placeholder="Add your review" v-model = "review" type = "text" id = "review-textarea">
+            <label for = "review-textarea">Review (Max 500 Characters)</label>
+            <textarea maxLength = "500" placeholder="Add your review" v-model = "review" type = "text" id = "review-textarea">
             </textarea>
         </div>
         <div class = "add-review-button">
@@ -102,8 +102,8 @@ export default {
 
 <style scoped>
 form {
-    height:400px;
-    width:550px;
+    height:420px;
+    width:580px;
     display:flex;
     flex-direction:column;
     justify-content: flex-start;
@@ -186,7 +186,7 @@ form {
     display: flex;
     flex-direction:column;
     width:90%;
-    height:130px;
+    height:170px;
     justify-content: flex-start;
     align-items: left;
 }
@@ -201,6 +201,8 @@ form {
     width:100%;
     border-radius:10px;
     border:1px solid orange;
+    resize:none;
+    height:140px;
 }
 
 .add-review-button {

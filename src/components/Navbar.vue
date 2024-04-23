@@ -18,8 +18,8 @@
             <div v-else id="profile-menu" @click="toggleDropdown" class="profile-dropdown">
               <img v-bind:src="profileImageUrl" alt="Profile" class="profile-icon" />
               <div v-if="dropdownOpen" class="dropdown-content">
-                <a @click="goUserProfile">Your Profile</a>
-                <a @click.prevent="tempLogout">Log Out</a>
+                <a class = "dropdown-options" @click="goUserProfile">Your Profile</a>
+                <a class = "dropdown-options" @click.prevent="tempLogout">Log Out</a>
               </div>
             </div>
         </div>
@@ -71,8 +71,6 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                   this.profileImageUrl = docSnap.data().profileImageUrl || '';
-                  console.log('User Data:', docSnap.data());
-                  console.log('Questionaire Filled:', docSnap.data().filledQuestionaire);
                   if (!docSnap.data().filledQuestionaire) {
                     console.log('Redirecting to SignUpQuestionaire');
                     this.$router.push({ name: 'SignUpQuestionaire', params: { userId: user.uid } });
@@ -236,5 +234,9 @@
   object-fit: cover; /* Ensures the image covers the area without distortion */
   cursor: pointer; /* Changes the cursor to indicate it's clickable */
   position: relative;
+}
+
+.dropdown-options:hover {
+    background-color:orange;
 }
 </style>

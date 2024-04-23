@@ -319,12 +319,12 @@ export default {
         @click="setActiveTab('past-projects')"
         >Past Projects</span
       >
-      <span
+      <span v-show = "uid === userId"
         :class="{ active: activeTab === 'saved-projects' }"
         @click="setActiveTab('saved-projects')"
         >Saved Projects</span
       >
-      <span
+      <span v-show = "uid === userId"
         :class="{ active: activeTab === 'pending-projects' }"
         @click="setActiveTab('pending-projects')"
         >Pending Projects</span
@@ -333,7 +333,7 @@ export default {
 
     <div class="project-container-wrapper">
       <div v-show="activeTab === 'my-projects'" class="project-container">
-        <!-- <Card v-for="project in hostedProjects" :key="project.id" :project="project" :image-url="project.projectImage"/> -->
+        <h1 class = "empty-project-tab" v-show = "hostedProjects.length === 0">No Hosted Project, Create Your First One Now!</h1>
         <Card
           v-for="project in hostedProjects"
           :key="project.id"
@@ -343,7 +343,8 @@ export default {
           :show-notifications="uid === userId"
         />
       </div>
-      <div v-show="activeTab === 'current-projects'" class="project-container">
+      <div class="project-container" v-show="activeTab === 'current-projects'">
+        <h1  class = "empty-project-tab" v-show = "currentProjects.length === 0">No Current Project, Join a Project Now!</h1>
         <Card
           v-for="project in currentProjects"
           :key="project.id"
@@ -351,7 +352,8 @@ export default {
           :image-url="project.projectImage"
         />
       </div>
-      <div v-show="activeTab === 'past-projects'" class="project-container">
+      <div class="project-container" v-show="activeTab === 'past-projects'">
+        <h1 class = "empty-project-tab" v-show = "pastProjects.length === 0">No Past Project</h1>
         <Card
           v-for="project in pastProjects"
           :key="project.id"
@@ -359,7 +361,8 @@ export default {
           :image-url="project.projectImage"
         />
       </div>
-      <div v-show="activeTab === 'saved-projects'" class="project-container">
+      <div class="project-container" v-show="activeTab === 'saved-projects'">
+        <h1 class = "empty-project-tab" v-show = "savedProjects.length === 0">No Saved Project, Save a Project Now!</h1>
         <Card
           v-for="project in savedProjects"
           :key="project.id"
@@ -367,7 +370,8 @@ export default {
           :image-url="project.projectImage"
         />
       </div>
-      <div v-show="activeTab === 'pending-projects'" class="project-container">
+      <div class="project-container" v-show="activeTab === 'pending-projects'">
+        <h1 class = "empty-project-tab" v-show = "pendingProjects.length === 0">No Pending Project, Apply For a Project Now!</h1>
         <Card
           v-for="project in pendingProjects"
           :key="project.id"
@@ -382,8 +386,8 @@ export default {
 
 <style scoped>
 .main-container {
-  height: 100%;
   width: 100%;
+  height:100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -394,7 +398,7 @@ export default {
 .profile-section {
   width: 100%;
   padding: 2% 10%;
-  height: 90%;
+  height: 550px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -467,14 +471,14 @@ export default {
 }
 
 .skills-description {
-  margin-top: 10px;
-  height: 90%;
+  margin-top: 20px;
+  height: 450px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: left;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 15px;
 }
 
 .interests,
@@ -517,7 +521,6 @@ export default {
 }
 
 .description {
-  height: 40%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -596,8 +599,8 @@ export default {
   height: 50px;
   width: 100%;
   padding: 0% 10%;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  margin-top:20px;
+  margin-bottom: 20px;
   font-size: 17px;
   font-weight: 1000px;
   gap: 30px;
@@ -621,11 +624,21 @@ export default {
 
 .project-container-wrapper {
   width: 100%;
-  padding-left: 10%;
+  padding:0% 10%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  margin-bottom: 20px;
+}
+
+.empty-project-tab {
+    text-align: center;
+    padding-top:100px;
+    width:100%;
+    height:300px;
+    font-size: 50px;
+    color: rgba(255, 115, 0, 0.975);
 }
 
 .project-container {

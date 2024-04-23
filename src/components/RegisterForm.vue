@@ -14,15 +14,15 @@
             <label for = "auth-confirm-password-input">Confirm Password</label>
             <input type = "password" autocomplete = "off" v-model = "ConfirmPassword" id = "auth-confirm-password-input" placeholder = "confirm password">
         </div>
-        <button type = "button" v-on:click.prevent = "register">Register</button>
+        <button :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" type = "button" v-on:click.prevent = "register">Register</button>
     </form>
 </template>
 
 <script>
 import firebaseApp from "../Firebase.js";
-import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
+import { getFirestore, doc, setDoc} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 
 export default {
     data() {
@@ -30,7 +30,6 @@ export default {
             EmailAddress: "",
             Password: "",
             ConfirmPassword: "",
-            loading: false,
 
         }
     },
@@ -41,8 +40,6 @@ export default {
             if (this.Password != this.ConfirmPassword) {
                 alert("Passwords do not match, please try again");
             } else if (!regex.test(this.Password)) {
-                console.log(this.Password);
-                console.log(regex.test(this.Password));
                 alert("Password has to contain a least one special, one uppercase and one lowercase character and has to be at least 8 character long");
             }
             else {
@@ -81,10 +78,8 @@ export default {
                 } else {
                     alert("Please enter a valid email.")
                 }
-                //alert("Registration is not successful, please try again!");
             };
             }
-            this.loading = false;
         }
     }
 }
@@ -109,9 +104,9 @@ export default {
 #authForm input {
     width: 350px;
     height:35px;
-    border:none;
+    border:1px solid #F5793B;
     border-radius: 3px;
-    background-color: #cacaca;
+    background-color: white;
 }
 
 #authForm label {
@@ -141,6 +136,10 @@ export default {
     height:30px;
     width: 65px;
     border-radius:3px;   
+}
+
+#authForm button:hover {
+    background-color: orange;
 }
 
 </style>

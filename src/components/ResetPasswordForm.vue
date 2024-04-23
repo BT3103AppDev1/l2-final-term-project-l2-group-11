@@ -6,38 +6,13 @@
         </div>
 
         <button class = "request-reset-link-button" v-show = "state == 'Verify'" type = "button" :disabled = "EmailAddress == ''" v-on:click.prevent = "resetPasswordRequest">Request Reset Password Link </button>
-        <!--
-        <div v-show = "state == 'Verified'" class = "label-input-div">
-            <label for = "auth-password-input">Password</label>
-            <input type = "text" v-model = "Password" id = "auth-password-input" placeholder = " Password">
-        </div>
-        <div v-show = "state == 'Verify'" class = "label-input-div">
-            <label for = "auth-verification-code-input">Verification Code</label>
-            <div class = "auth-verification-code-input-div">
-                <input type = "text" v-model = "VerificationCode" id = "auth-verification-code-input" placeholder = " Verification Code">
-                <button type = "button" :disabled = "EmailAddress == ''" v-on:click = "resetPasswordRequest">Request Code</button>
-            </div>
-        </div>
-
-        <div v-show = "state == 'Verified'" class = "label-input-div">
-            <label for = "auth-confirm-password-input">Confirm Password</label>
-            <input type = "text" v-model = "ConfirmPassword" id = "auth-confirm-password-input" placeholder = "confirm password">
-        </div>
-        <button v-show = "state == 'Verified'" type = "button" :disabled = "EmailAddress == '' && Password == '' && ConfirmPassword == ''" v-on:click.prevent = "resetPassword">Reset</button>
-        <button v-show = "state == 'Verify'" type = "button" :disabled = "EmailAddress == '' && VerificationCode == ''" v-on:click.prevent = "verify">Verify</button>
-    -->
     </form>
 </template>
 
 <script>
 import firebaseApp from "../Firebase.js";
-import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
-const db = getFirestore(firebaseApp);
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail} from "firebase/auth";
-const actionCodeSettings = {
-  url: 'https://http://localhost:5174/auth/login',
-  handleCodeInApp: true
-};
+
+import { getAuth, sendPasswordResetEmail} from "firebase/auth";
 
 export default {
     data() {
@@ -55,7 +30,7 @@ export default {
         resetPasswordRequest() {
             sendPasswordResetEmail(getAuth(firebaseApp), this.EmailAddress)
             .then( () => {
-                alert("A an email has been sent to reset your password, please check your email!");
+                alert("An email has been sent to reset your password, please check your email!");
                 this.$emit("changeStateToLogin");
             })
             .catch((error) => {
@@ -95,27 +70,14 @@ export default {
 #authForm input {
     width: 350px;
     height:35px;
-    border:none;
+    border:1px solid #F5793B;
     border-radius: 3px;
-    background-color: #cacaca;
+    background-color: white;
 }
 
 #authForm label {
     font-size: 13px;
     color:#F5793B;
-}
-
-.auth-verification-code-input-div {
-    width:350px;
-    display:flex;
-    flex-direction:row;
-    justify-content: flex-start;
-    align-items:center;
-}
-
-#authForm .auth-verification-code-input-div input {
-    width:275px;
-    border-radius: 3px 0px 0px 3px;
 }
 
 #authForm button {
@@ -129,15 +91,11 @@ export default {
     border-radius:3px;   
 }
 
-#authForm button:disabled {
-    background-color: grey;
+#authForm button:hover {
+    background-color: orange;
 }
 
-#authForm .auth-verification-code-input-div button {
-    width:75px;
-    height:35px;
-    border-radius: 0px 3px 3px 0px;
-}
+
 
 
 </style>

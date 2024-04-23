@@ -225,6 +225,7 @@ export default {
 img {
     height: 170px;
     width: 100%;
+    object-fit: fill;
 }
 
 .project-management {
@@ -235,6 +236,7 @@ img {
 .project-management_title {
     color: #f76d28;
     font: 600 50px/1 Inter, sans-serif;
+    margin-top:10px;
 }
 
 .project-management_title-text {

@@ -1,5 +1,4 @@
 <script setup>
-import loadingSpinner from "./Loading.vue";
 import LoginForm from "./LoginForm.vue";
 import RegisterForm from "./RegisterForm.vue";
 import ResetPasswordForm from "./ResetPasswordForm.vue";
@@ -51,7 +50,7 @@ import ResetPasswordForm from "./ResetPasswordForm.vue";
 
 <script>
 import firebaseApp from "../Firebase.js";
-import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
@@ -124,7 +123,6 @@ export default {
         }
     },
     components: {
-        loadingSpinner,
         LoginForm,
         RegisterForm,
         ResetPasswordForm

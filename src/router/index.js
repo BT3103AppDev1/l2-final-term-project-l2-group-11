@@ -8,7 +8,7 @@ import Profile from '../views/Profile.vue'
 import EditProfile from '../views/EditProfile.vue'
 import ManagePrj from '../components/ManagePrj.vue'
 import ReviewsPage from "../views/ReviewsPage.vue"
-import CreateProject from "../components/Cppp.vue"
+import CreateProject from "../views/CreateProjProfile.vue"
 import RegisterForm from "../components/RegisterForm.vue"
 import EditProjectProfile from '@/views/EditProjectProfile.vue'
 

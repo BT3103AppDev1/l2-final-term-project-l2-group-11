@@ -165,8 +165,11 @@ export default {
     color: white;
     font-family: Garamond, serif;
     font-weight: 600;
-    border-color: #f5793b;
+    border:1px solid #f5793b;
+}
 
+#join:hover {
+    background-color: orange;
 }
 
 .intro {

@@ -131,14 +131,14 @@
                <input type = "text" id = "interests" v-model = "formData.interests" required placeholder = "Enter your interests">
            </div>
            <div id = "shortBio">
-               <label for = "shortBio">Short Bio (less than 30 words): </label>
-               <input type = "text" id = "shortBio" v-model = "formData.shortBio" required placeholder = "Enter details about yourself here">
+               <label for = "shortBio">Short Bio (Max 150 characters): </label>
+               <input type = "text" id = "shortBio" v-model = "formData.shortBio" maxlength="150" placeholder = "Enter details about yourself here">
            </div>
 
            <div id = "description">
-               <label for = "description"> Describe Yourself: </label>
-               <input type = "text" id = "description" v-model = "formData.description" required placeholder = "Enter details about yourself here">
-           </div>
+                <label for = "description"> Describe Yourself (Max 600 characters)</label>
+                <textarea type = "text" id = "description" v-model = "formData.description" maxLength = "600" required placeholder = "Enter details about yourself here"></textarea>
+            </div>
            
            <div class = "form-heading">
                <h4>Social Media</h4>
@@ -301,6 +301,15 @@ form div {
     justify-content: center;
     width:600px;
 }
+
+form textarea {
+    width: 100%; 
+    height:150px;
+    border-radius: 5px;
+    border:1px solid black;
+    resize:none;
+}
+
 
 #saveButton {
     background-color: #FF6A3D; /* Orange background color */

@@ -82,7 +82,7 @@ export default {
   <div id="flex-container">
     <div id="title-container">
       <div id="title">
-        <mark class="orange">Collab</mark> <mark class="black">with your peer to</mark> <mark class="orange"> explore
+        <mark class="orange">Collab</mark> <mark class="black">with your peers to</mark> <mark class="orange"> explore
           your potential</mark> <br>
       </div>
       <div id="search-bar">
@@ -157,18 +157,19 @@ export default {
 
 #title {
   font-size: 35px;
-  font-weight: 650;
+  font-weight: 600;
   text-align: center;
   color: black;
+  width:1020px;
 }
 
 #search-bar {
   margin-top: 20px;
   display: flex;
-  justify-content: center;
-  gap: 30px;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
+  width:1020px;
 }
 
 #rounded-search {
@@ -178,7 +179,7 @@ export default {
   /* This makes the input rounded */
   outline: none;
   font-size: 16px;
-  width: 600px;
+  width: 720px;
   height: 40px;
 }
 

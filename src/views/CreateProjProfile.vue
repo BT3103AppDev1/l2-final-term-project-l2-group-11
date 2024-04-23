@@ -26,8 +26,8 @@
                     style="display: none;">
             </div>
             <div class="description">
-                <h3>Description</h3>
-                <textarea id="description" required v-model="projectDescription"></textarea>
+                <h3>Description (Max 1000 characters)</h3>
+                <textarea id="description" required v-model="projectDescription" maxLength="1000"></textarea>
             </div> 
         </div>
 
@@ -70,8 +70,9 @@
     </div> 
 
     <div class="launchProj">
-        <button id = "launchProj-button" @click="saveChanges(), this.$router.push({ name: 'ProjProfile', params: { id: this.$route.params.id } })"
-            :disabled="projectEnd === null || projectStart === null || signupDeadline === null || skillsRequired == '' || membersRequired == '' || projectDescription == '' || projectName == ''">Save Changes</button>
+        <button id = "launchProj-button" @click="launchProject(), $router.push('Project')"
+            :disabled="projectEnd === null || projectStart === null || signupDeadline === null || skillsRequired == '' || membersRequired == '' || projectDescription == '' || projectName == ''">Launch
+            Project</button>
     </div>
 </div>
 </template>
@@ -79,15 +80,19 @@
 <script>
 import firebaseApp from '../Firebase.js'
 import { getFirestore } from "firebase/firestore";
-import { doc, getDoc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, addDoc, collection, updateDoc, Timestamp, arrayUnion } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 const db = getFirestore(firebaseApp);
 
 export default {
-    name: 'EditProjectProfile',
+    name: 'CreateProjProfile',
 
     data() {
         return {
+            defaultThumbnail: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppThumbnail.png?alt=media&token=d0384134-d797-4e93-a83c-4e21d957909b',
+            defaultBackground: 'https://firebasestorage.googleapis.com/v0/b/kaizen-79eda.appspot.com/o/projectImages%2FCpppImage.png?alt=media&token=1a7b60af-7c62-4b51-bfe0-fdd282569967',
+            pageBackgroundColor: '#FDF8F6',
             projectName: "",
             projectDescription: "",
             skillsRequired: "",
@@ -97,37 +102,21 @@ export default {
             projectHost: "",
             projectMembers: [],
             projectID: "",
-            projectImage: null,
-            projectThumbnailUrl: null,
-            projectBackground: "",
             projectStart: null,
             projectEnd: null,
-            pendingMembers: []
+            projectImage: null,
+            projectImagePreview: null,
+            projectBackground: null,
+            projectBackgroundPreview: null,
+            pendingMembers: [],
+            projectCompleted: false
         }
     },
 
     methods: {
-        async fetchProjectDetails() {
-            this.projectID = this.$route.params.id;
-            let docRef = doc(db, "Project Collection", this.projectID);
-            let docSnap = await getDoc(docRef);
-            let projectData = docSnap.data()
-            this.projectName = projectData.projectName;
-            this.projectDescription = projectData.projectDescription;
-            this.projectHost = projectData.projectHost;
-            this.projectMembers = projectData.projectMembers;
-            this.membersRequired = projectData.membersRequired;
-            this.skillsRequired = projectData.skillsRequired;
-            this.pendingMembers = projectData.pendingMembers;
-            this.findOutMore = projectData.Find_Out_More;
-            this.projectImage = projectData.projectImage;
-            this.projectBackground = projectData.projectBackground;
-            let projectEndTimestampToDate = new Date(projectData.projectEnd.seconds * 1000);
-            let projectStartTimestampToDate = new Date(projectData.projectStart.seconds * 1000);
-            let signupDeadlineTimestampToDate = new Date(projectData.signupDeadline.seconds * 1000);
-            this.projectEnd = "" + projectEndTimestampToDate.getFullYear() + "-" + (Math.floor(projectEndTimestampToDate.getMonth() / 10) === 0 ? "0" + projectEndTimestampToDate.getMonth() : projectEndTimestampToDate.getMonth()) + "-" + (Math.floor(projectEndTimestampToDate.getDay() / 10) === 0 ? "0" + projectEndTimestampToDate.getDay() : projectEndTimestampToDate.getDay());
-            this.projectStart = "" + projectStartTimestampToDate.getFullYear() + "-" + (Math.floor(projectStartTimestampToDate.getMonth() / 10) === 0 ? "0" + projectStartTimestampToDate.getMonth() : projectStartTimestampToDate.getMonth()) + "-" + (Math.floor(projectStartTimestampToDate.getDay() / 10) === 0 ? "0" + projectStartTimestampToDate.getDay() : projectStartTimestampToDate.getDay());
-            this.signupDeadline = "" + signupDeadlineTimestampToDate.getFullYear() + "-" + (Math.floor(signupDeadlineTimestampToDate.getMonth() / 10) === 0 ? "0" + signupDeadlineTimestampToDate.getMonth() : signupDeadlineTimestampToDate.getMonth()) + "-" + (Math.floor(signupDeadlineTimestampToDate.getDay() / 10) === 0 ? "0" + signupDeadlineTimestampToDate.getDay() : signupDeadlineTimestampToDate.getDay());
+        setBodyBackGroundColor(color) {
+            //apply background color to the body of the webpage
+            document.body.style.backgroundColor = color;
         },
 
         convertDateToTimestamp(dateStr) {
@@ -138,22 +127,26 @@ export default {
             return Timestamp.fromDate(date); // Convert the Date object to a Firestore Timestamp
         },
 
-
-        async saveChanges() {
+        async launchProject() {
             console.log("IN LP")
-            alert("Saving changes to your project")
+            alert(" Launching your project : " + projectName)
 
             try {
-                const docRef = await updateDoc(doc(db, "Project Collection", this.projectID), {
+                const docRef = await addDoc(collection(db, "Project Collection"), {
                     projectName: this.projectName, projectDescription: this.projectDescription, skillsRequired: this.skillsRequired,
                     Find_Out_More: this.findOutMore, membersRequired: parseInt(this.membersRequired), projectStart: this.convertDateToTimestamp(this.projectStart),
                     projectEnd: this.convertDateToTimestamp(this.projectEnd), signupDeadline: this.convertDateToTimestamp(this.signupDeadline), projectID: this.projectID, projectHost: this.projectHost,
-                    projectMembers: this.projectMembers, projectImage: this.projectImage, projectBackground: this.projectBackground,
-                    projectImage: this.projectImage, projectThumbnailUrl: this.projectThumbnailUrl
+                    projectMembers: this.projectMembers, projectImage: this.projectImage != null ? this.projectImage : this.defaultThumbnail, projectBackground: this.projectBackground != null ? this.projectBackground : this.defaultBackground,
+                    pendingMembers: this.pendingMembers,
+                    projectCompleted: this.projectCompleted
                 });
+                let updateDocRef = doc(db, 'Project Collection', docRef.id);
+                await updateDoc(updateDocRef, { projectID: docRef.id });
+                let hostRef = doc(db, 'User Information', this.projectHost);
+                await updateDoc(hostRef, { hostedProjects: arrayUnion(docRef.id), currentProjects: arrayUnion(docRef.id) });
             }
             catch (error) {
-                console.error("Error saving document: ", error);
+                console.error("Error adding document: ", error);
             }
         },
 
@@ -175,23 +168,13 @@ export default {
         async previewImage(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.projectImage = e.target.result;
+                this.projectImagePreview = e.target.result;
             };
 
             reader.onloadend = async () => {
-                // This should be called when the reader has finished reading the file
-                try {
-                    const downloadURL = await this.uploadImage(file);
-                    if (downloadURL) {
-                        this.projectThumbnailUrl = downloadURL;
-                        const docRef = doc(db, 'Project Collection', this.projectID);
-                        await setDoc(docRef, {
-                            projectImage: downloadURL, // Save the image URL in Firestore
-                        }, { merge: true });
-                        console.log("Firestore document updated with image URL");
-                    }
-                } catch (error) {
-                    console.error("Error updating Firestore document or uploading image: ", error);
+                const downloadURL = await this.uploadImage(file);
+                if (downloadURL) {
+                    this.projectImage = downloadURL;
                 }
             };
             reader.readAsDataURL(file); // Start reading the file
@@ -214,6 +197,7 @@ export default {
                 throw error;
             }
         },
+
 
         triggerFileUploadForBackground() {
             // Trigger the hidden file input when the button is clicked
@@ -264,7 +248,14 @@ export default {
     },
 
     mounted() {
-        this.fetchProjectDetails();
+        this.setBodyBackGroundColor(this.pageBackgroundColor);
+
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.projectHost = user.uid;
+            }
+        });
     }
 }
 </script>

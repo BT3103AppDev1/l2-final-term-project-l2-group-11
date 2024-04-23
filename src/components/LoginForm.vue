@@ -14,9 +14,9 @@
 
 <script>
 import firebaseApp from "../Firebase.js";
-import { getFirestore, doc, deleteDoc, collection, getDoc, setDoc} from "firebase/firestore";
+import { getFirestore} from "firebase/firestore";
 const db = getFirestore(firebaseApp);
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
+import { getAuth,signInWithEmailAndPassword} from "firebase/auth";
 
 export default {
     data() {
@@ -67,9 +67,9 @@ export default {
 #authForm input {
     width: 350px;
     height:35px;
-    border:none;
+    border:1px solid #F5793B;
     border-radius: 3px;
-    background-color: #cacaca;
+    background-color: white;
 }
 
 #authForm label {
@@ -101,7 +101,7 @@ export default {
     border-radius:3px;   
 }
 
-#authForm button:disabled {
-    background-color: grey;
+#authForm button:hover {
+    background-color: orange;
 }
 </style>
