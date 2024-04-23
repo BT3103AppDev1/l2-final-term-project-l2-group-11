@@ -128,8 +128,7 @@ export default {
         },
 
         async launchProject() {
-            console.log("IN LP")
-            alert(" Launching your project : " + projectName)
+            alert(" Launching your project : " + this.projectName)
 
             try {
                 const docRef = await addDoc(collection(db, "Project Collection"), {
