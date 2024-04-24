@@ -43,8 +43,7 @@
             isLoggedIn : false,
             dropdownOpen: false,
             uid: '',
-            userProfile: null,
-            profileImageUrl:''
+            userProfile: null
         }
     }, 
     methods : {
@@ -70,7 +69,6 @@
                 const docRef = doc(db, "User Information", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                  this.profileImageUrl = docSnap.data().profileImageUrl || '';
                   if (!docSnap.data().filledQuestionaire) {
                     console.log('Redirecting to SignUpQuestionaire');
                     this.$router.push({ name: 'SignUpQuestionaire', params: { userId: user.uid } });
@@ -80,7 +78,6 @@
                 this.isLoggedIn = false;
                 this.uid = '';
                 this.userProfile = null;
-                this.profileImageUrl = '';
             }
         });
     }
