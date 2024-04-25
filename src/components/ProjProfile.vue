@@ -259,7 +259,7 @@ export default {
 }
 
 #projTitle {
-    font-size: 55px;
+    font-size: 40px;
     text-align: left;
     padding-right: 10px;
     font-weight: 700
